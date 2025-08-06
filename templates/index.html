@@ -1,0 +1,992 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - FullStock AI vNext Ultimate{% endblock %}
+
+{% block meta_description %}
+Advanced AI-powered stock prediction dashboard with real-time analysis, crypto support, and machine learning insights.
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Quick Actions Card -->
+    <div class="col-12">
+        <div class="card bg-secondary border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-lightning-charge fs-5 me-2"></i>
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3" onclick="showQuickPrediction()">
+                            <i class="bi bi-graph-up fs-3"></i>
+                            <small class="mt-1">Quick Predict</small>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3" onclick="showCryptoOverview()">
+                            <i class="bi bi-currency-bitcoin fs-3"></i>
+                            <small class="mt-1">Crypto Market</small>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3" onclick="showPortfolioSummary()">
+                            <i class="bi bi-briefcase fs-3"></i>
+                            <small class="mt-1">Portfolio</small>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3" onclick="showOracleVision()">
+                            <i class="bi bi-eye fs-3"></i>
+                            <small class="mt-1">Oracle Vision</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Market Overview -->
+    <div class="col-12 col-lg-8">
+        <div class="card bg-secondary border-0 shadow-sm h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-globe fs-5 me-2 text-info"></i>
+                    <h5 class="card-title mb-0">Market Overview</h5>
+                </div>
+                <button class="btn btn-outline-info btn-sm" onclick="refreshMarketData()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="market-overview-content">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading market data...</span>
+                        </div>
+                        <div class="mt-2 text-muted">Loading market overview...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Live Insights Panel -->
+    <div class="col-12 col-lg-4">
+        <div class="card bg-secondary border-0 shadow-sm h-100">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-activity fs-5 me-2 text-success"></i>
+                    <h5 class="card-title mb-0">Live Insights</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="live-insights">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success rounded-circle p-2 me-3">
+                            <i class="bi bi-trending-up text-white"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">Market Sentiment</div>
+                            <small class="text-muted">Real-time analysis</small>
+                        </div>
+                    </div>
+                    
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: 65%"></div>
+                    </div>
+                    <div class="text-end small text-muted mb-4">65% Bullish</div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary rounded-circle p-2 me-3">
+                            <i class="bi bi-robot text-white"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">AI Models Status</div>
+                            <small class="text-muted">All systems operational</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-warning rounded-circle p-2 me-3">
+                            <i class="bi bi-eye text-white"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">Oracle State</div>
+                            <small class="text-muted" id="oracle-state">CONTEMPLATION</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Watchlist -->
+    <div class="col-12 col-md-6">
+        <div class="card bg-secondary border-0 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-bookmark-star fs-5 me-2 text-warning"></i>
+                    <h5 class="card-title mb-0">Watchlist</h5>
+                </div>
+                <button class="btn btn-outline-primary btn-sm" onclick="addToWatchlist()">
+                    <i class="bi bi-plus"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="watchlist-container">
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-bookmark fs-1 opacity-50"></i>
+                        <div class="mt-2">No symbols in watchlist</div>
+                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="addToWatchlist()">
+                            Add Symbol
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Predictions -->
+    <div class="col-12 col-md-6">
+        <div class="card bg-secondary border-0 shadow-sm">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-clock-history fs-5 me-2 text-info"></i>
+                    <h5 class="card-title mb-0">Recent Predictions</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="recent-predictions">
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-graph-up fs-1 opacity-50"></i>
+                        <div class="mt-2">No recent predictions</div>
+                        <button class="btn btn-outline-success btn-sm mt-2" onclick="showQuickPrediction()">
+                            Make Prediction
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Performance Chart -->
+    <div class="col-12">
+        <div class="card bg-secondary border-0 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-bar-chart fs-5 me-2 text-primary"></i>
+                    <h5 class="card-title mb-0">Performance Dashboard</h5>
+                </div>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-info active" data-period="1D">1D</button>
+                    <button type="button" class="btn btn-outline-info" data-period="5D">5D</button>
+                    <button type="button" class="btn btn-outline-info" data-period="1M">1M</button>
+                    <button type="button" class="btn btn-outline-info" data-period="3M">3M</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <canvas id="performance-chart" width="400" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Quick Prediction Modal -->
+<div class="modal fade" id="quickPredictionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Quick Stock Prediction
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Stock Symbol</label>
+                    <div class="input-group">
+                        <input type="text" id="quick-symbol-input" class="form-control bg-secondary text-light border-secondary" 
+                               placeholder="Enter symbol (e.g., AAPL, BTC-USD)" onkeypress="handleQuickSymbolEnter(event)">
+                        <button class="btn btn-primary" onclick="performQuickPrediction()">
+                            <i class="bi bi-search"></i> Predict
+                        </button>
+                    </div>
+                    <div class="form-text">Supports stocks and cryptocurrencies</div>
+                </div>
+                
+                <div id="quick-prediction-results" class="d-none">
+                    <div class="card bg-secondary border-0">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary">Prediction Results</h6>
+                                    <div id="prediction-summary"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-success">Trading Signals</h6>
+                                    <div id="trading-signals"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="quick-prediction-loading" class="text-center py-3 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Analyzing...</span>
+                    </div>
+                    <div class="mt-2">Analyzing market data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Crypto Overview Modal -->
+<div class="modal fade" id="cryptoOverviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">
+                    <i class="bi bi-currency-bitcoin me-2"></i>
+                    Cryptocurrency Market
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="crypto-overview-content">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-success" role="status">
+                            <span class="visually-hidden">Loading crypto data...</span>
+                        </div>
+                        <div class="mt-2">Loading cryptocurrency market data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Portfolio Summary Modal -->
+<div class="modal fade" id="portfolioSummaryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">
+                    <i class="bi bi-briefcase me-2"></i>
+                    Portfolio Summary
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="portfolio-summary-content">
+                    <div class="text-center py-4">
+                        <i class="bi bi-briefcase fs-1 text-muted"></i>
+                        <div class="mt-2">No portfolio data available</div>
+                        <button class="btn btn-outline-primary mt-2" onclick="setupPortfolio()">
+                            Setup Portfolio
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Oracle Vision Modal -->
+<div class="modal fade" id="oracleVisionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye me-2"></i>
+                    Oracle Vision
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Symbol for Oracle Reading</label>
+                    <div class="input-group">
+                        <input type="text" id="oracle-symbol-input" class="form-control bg-secondary text-light border-secondary" 
+                               placeholder="Enter symbol for mystical analysis">
+                        <button class="btn btn-warning" onclick="getOracleVision()">
+                            <i class="bi bi-eye"></i> Consult Oracle
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="oracle-vision-content" class="d-none">
+                    <div class="card bg-secondary border-0">
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <span id="oracle-mystical-symbol" class="fs-1">🔮</span>
+                                <div class="mt-2">
+                                    <span class="badge bg-warning" id="oracle-emotional-state">CONTEMPLATION</span>
+                                </div>
+                            </div>
+                            <div id="oracle-narrative" class="text-center fst-italic mb-3">
+                                The Oracle prepares to speak...
+                            </div>
+                            <div id="oracle-symbolism" class="text-muted small">
+                                Ancient symbols await interpretation...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="oracle-loading" class="text-center py-3 d-none">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Consulting Oracle...</span>
+                    </div>
+                    <div class="mt-2">The Oracle peers into the market's soul...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Watchlist Add Modal -->
+<div class="modal fade" id="addWatchlistModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">
+                    <i class="bi bi-bookmark-plus me-2"></i>
+                    Add to Watchlist
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Symbol</label>
+                    <input type="text" id="watchlist-symbol-input" class="form-control bg-secondary text-light border-secondary" 
+                           placeholder="Enter symbol to watch" onkeypress="handleWatchlistEnter(event)">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Alert Threshold (optional)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-secondary text-light border-secondary">±</span>
+                        <input type="number" id="watchlist-threshold-input" class="form-control bg-secondary text-light border-secondary" 
+                               placeholder="5" min="1" max="50">
+                        <span class="input-group-text bg-secondary text-light border-secondary">%</span>
+                    </div>
+                    <div class="form-text">Alert when price changes by this percentage</div>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveToWatchlist()">
+                    <i class="bi bi-bookmark-check"></i> Add to Watchlist
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global variables
+let performanceChart = null;
+let watchlistSymbols = JSON.parse(localStorage.getItem('watchlist') || '[]');
+let recentPredictions = JSON.parse(localStorage.getItem('recentPredictions') || '[]');
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDashboard();
+});
+
+function initializeDashboard() {
+    loadMarketOverview();
+    loadWatchlist();
+    loadRecentPredictions();
+    initializePerformanceChart();
+    
+    // Refresh data every 5 minutes
+    setInterval(() => {
+        loadMarketOverview();
+        updateWatchlistPrices();
+    }, 300000);
+}
+
+function loadMarketOverview() {
+    fetch('/api/market_overview')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('market-overview-content').innerHTML = 
+                    '<div class="alert alert-warning">Unable to load market data</div>';
+                return;
+            }
+            
+            displayMarketOverview(data);
+        })
+        .catch(error => {
+            console.error('Error loading market overview:', error);
+            document.getElementById('market-overview-content').innerHTML = 
+                '<div class="alert alert-danger">Error loading market data</div>';
+        });
+}
+
+function displayMarketOverview(data) {
+    const indices = data.indices || {};
+    const cryptos = data.cryptos || [];
+    
+    let html = '<div class="row g-3">';
+    
+    // Market indices
+    if (Object.keys(indices).length > 0) {
+        html += '<div class="col-12"><h6 class="text-info mb-2">Major Indices</h6></div>';
+        
+        Object.entries(indices).forEach(([symbol, info]) => {
+            const changeClass = info.change_percent >= 0 ? 'text-success' : 'text-danger';
+            const changeIcon = info.change_percent >= 0 ? 'bi-arrow-up' : 'bi-arrow-down';
+            
+            html += `
+                <div class="col-6 col-lg-3">
+                    <div class="card bg-dark border-secondary h-100">
+                        <div class="card-body p-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold small">${symbol}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">${info.name}</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold">${info.price ? '$' + info.price.toFixed(2) : 'N/A'}</div>
+                                    <div class="${changeClass} small">
+                                        <i class="bi ${changeIcon}"></i>
+                                        ${info.change_percent ? info.change_percent.toFixed(2) + '%' : 'N/A'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    // Top cryptocurrencies
+    if (cryptos.length > 0) {
+        html += '<div class="col-12 mt-3"><h6 class="text-success mb-2">Top Cryptocurrencies</h6></div>';
+        
+        cryptos.slice(0, 4).forEach(crypto => {
+            html += `
+                <div class="col-6 col-lg-3">
+                    <div class="card bg-dark border-secondary h-100">
+                        <div class="card-body p-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold small">${crypto.name}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Crypto</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold">$${crypto.price.toFixed(2)}</div>
+                                    <div class="small text-muted">
+                                        Vol: ${crypto.volume.toLocaleString()}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    html += '</div>';
+    document.getElementById('market-overview-content').innerHTML = html;
+}
+
+function refreshMarketData() {
+    const button = event.target.closest('button');
+    const icon = button.querySelector('i');
+    
+    // Add spinning animation
+    icon.classList.add('fa-spin');
+    
+    loadMarketOverview();
+    
+    // Remove spin after 2 seconds
+    setTimeout(() => {
+        icon.classList.remove('fa-spin');
+    }, 2000);
+}
+
+// Quick prediction functions
+function showQuickPrediction() {
+    new bootstrap.Modal(document.getElementById('quickPredictionModal')).show();
+    document.getElementById('quick-symbol-input').focus();
+}
+
+function handleQuickSymbolEnter(event) {
+    if (event.key === 'Enter') {
+        performQuickPrediction();
+    }
+}
+
+function performQuickPrediction() {
+    const symbol = document.getElementById('quick-symbol-input').value.trim().toUpperCase();
+    
+    if (!symbol) {
+        showAlert('Please enter a symbol', 'warning');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('quick-prediction-loading').classList.remove('d-none');
+    document.getElementById('quick-prediction-results').classList.add('d-none');
+    
+    fetch(`/api/predict/${symbol}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('quick-prediction-loading').classList.add('d-none');
+            
+            if (data.error) {
+                showAlert('Error: ' + data.error, 'danger');
+                return;
+            }
+            
+            displayQuickPrediction(data);
+            
+            // Save to recent predictions
+            addToRecentPredictions(data);
+        })
+        .catch(error => {
+            document.getElementById('quick-prediction-loading').classList.add('d-none');
+            showAlert('Error fetching prediction: ' + error.message, 'danger');
+        });
+}
+
+function displayQuickPrediction(data) {
+    const prediction = data.prediction;
+    const ensemble = data.ensemble_signal;
+    
+    const changeClass = prediction.change_percent >= 0 ? 'text-success' : 'text-danger';
+    const signalClass = ensemble.signal === 'BUY' ? 'success' : ensemble.signal === 'SELL' ? 'danger' : 'warning';
+    
+    document.getElementById('prediction-summary').innerHTML = `
+        <div class="mb-2">
+            <strong>Current:</strong> $${prediction.current_price}
+        </div>
+        <div class="mb-2">
+            <strong>Predicted:</strong> $${prediction.prediction}
+            <span class="${changeClass} ms-2">
+                ${prediction.change_percent >= 0 ? '+' : ''}${prediction.change_percent}%
+            </span>
+        </div>
+        <div class="mb-2">
+            <strong>Confidence:</strong> ${prediction.confidence}%
+        </div>
+        <div class="mb-2">
+            <strong>Model:</strong> ${prediction.model_type}
+        </div>
+    `;
+    
+    document.getElementById('trading-signals').innerHTML = `
+        <div class="mb-2">
+            <span class="badge bg-${signalClass}">${ensemble.signal}</span>
+            <span class="ms-2">${ensemble.confidence}% confidence</span>
+        </div>
+        <div class="small text-muted">
+            ${ensemble.reason}
+        </div>
+    `;
+    
+    document.getElementById('quick-prediction-results').classList.remove('d-none');
+}
+
+// Crypto overview functions
+function showCryptoOverview() {
+    const modal = new bootstrap.Modal(document.getElementById('cryptoOverviewModal'));
+    modal.show();
+    loadCryptoOverview();
+}
+
+function loadCryptoOverview() {
+    fetch('/api/crypto/market')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('crypto-overview-content').innerHTML = 
+                    '<div class="alert alert-warning">Unable to load crypto data</div>';
+                return;
+            }
+            
+            displayCryptoOverview(data);
+        })
+        .catch(error => {
+            document.getElementById('crypto-overview-content').innerHTML = 
+                '<div class="alert alert-danger">Error loading crypto data</div>';
+        });
+}
+
+function displayCryptoOverview(data) {
+    const cryptos = data.cryptos || {};
+    
+    let html = '<div class="row g-3">';
+    
+    Object.entries(cryptos).forEach(([symbol, info]) => {
+        const changeClass = info.change_24h >= 0 ? 'text-success' : 'text-danger';
+        const changeIcon = info.change_24h >= 0 ? 'bi-arrow-up' : 'bi-arrow-down';
+        
+        html += `
+            <div class="col-md-6 col-lg-4">
+                <div class="card bg-secondary border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-0">${info.name}</h6>
+                                <small class="text-muted">${symbol}</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">$${info.price.toLocaleString()}</div>
+                                <div class="${changeClass} small">
+                                    <i class="bi ${changeIcon}"></i>
+                                    ${info.change_24h.toFixed(2)}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>Volume</span>
+                            <span>${info.volume.toLocaleString()}</span>
+                        </div>
+                        <div class="mt-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" 
+                                    onclick="predictCrypto('${symbol}')">
+                                Analyze ${info.name}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    document.getElementById('crypto-overview-content').innerHTML = html;
+}
+
+// Portfolio functions
+function showPortfolioSummary() {
+    const modal = new bootstrap.Modal(document.getElementById('portfolioSummaryModal'));
+    modal.show();
+    loadPortfolioSummary();
+}
+
+function loadPortfolioSummary() {
+    fetch('/api/portfolio')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('portfolio-summary-content').innerHTML = 
+                    '<div class="alert alert-warning">Unable to load portfolio</div>';
+                return;
+            }
+            
+            displayPortfolioSummary(data);
+        })
+        .catch(error => {
+            document.getElementById('portfolio-summary-content').innerHTML = 
+                '<div class="alert alert-danger">Error loading portfolio</div>';
+        });
+}
+
+// Oracle Vision functions
+function showOracleVision() {
+    new bootstrap.Modal(document.getElementById('oracleVisionModal')).show();
+    document.getElementById('oracle-symbol-input').focus();
+}
+
+function getOracleVision() {
+    const symbol = document.getElementById('oracle-symbol-input').value.trim().toUpperCase();
+    
+    if (!symbol) {
+        showAlert('Please enter a symbol for Oracle reading', 'warning');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('oracle-loading').classList.remove('d-none');
+    document.getElementById('oracle-vision-content').classList.add('d-none');
+    
+    fetch(`/api/oracle/${symbol}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('oracle-loading').classList.add('d-none');
+            
+            if (data.error) {
+                showAlert('Oracle vision unclear: ' + data.error, 'warning');
+                return;
+            }
+            
+            displayOracleVision(data);
+        })
+        .catch(error => {
+            document.getElementById('oracle-loading').classList.add('d-none');
+            showAlert('The Oracle grows silent: ' + error.message, 'danger');
+        });
+}
+
+function displayOracleVision(data) {
+    document.getElementById('oracle-mystical-symbol').textContent = data.mystical_symbol;
+    document.getElementById('oracle-emotional-state').textContent = data.emotional_state;
+    document.getElementById('oracle-narrative').textContent = data.narrative;
+    
+    const symbolism = data.symbolism;
+    document.getElementById('oracle-symbolism').innerHTML = `
+        <div class="mt-3">
+            <div class="d-flex align-items-center mb-2">
+                <span class="fs-4 me-2">${symbolism.primary_symbol}</span>
+                <div>
+                    <div class="fw-bold">${symbolism.interpretation}</div>
+                    <div class="small">${symbolism.mystical_significance}</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('oracle-vision-content').classList.remove('d-none');
+    
+    // Update the live insights oracle state
+    document.getElementById('oracle-state').textContent = data.emotional_state;
+}
+
+// Watchlist functions
+function addToWatchlist() {
+    new bootstrap.Modal(document.getElementById('addWatchlistModal')).show();
+    document.getElementById('watchlist-symbol-input').focus();
+}
+
+function handleWatchlistEnter(event) {
+    if (event.key === 'Enter') {
+        saveToWatchlist();
+    }
+}
+
+function saveToWatchlist() {
+    const symbol = document.getElementById('watchlist-symbol-input').value.trim().toUpperCase();
+    const threshold = parseFloat(document.getElementById('watchlist-threshold-input').value) || 5;
+    
+    if (!symbol) {
+        showAlert('Please enter a symbol', 'warning');
+        return;
+    }
+    
+    if (watchlistSymbols.some(item => item.symbol === symbol)) {
+        showAlert('Symbol already in watchlist', 'info');
+        return;
+    }
+    
+    watchlistSymbols.push({
+        symbol: symbol,
+        threshold: threshold,
+        added: new Date().toISOString()
+    });
+    
+    localStorage.setItem('watchlist', JSON.stringify(watchlistSymbols));
+    
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('addWatchlistModal')).hide();
+    
+    // Refresh watchlist display
+    loadWatchlist();
+    
+    showAlert(`Added ${symbol} to watchlist`, 'success');
+}
+
+function loadWatchlist() {
+    const container = document.getElementById('watchlist-container');
+    
+    if (watchlistSymbols.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-bookmark fs-1 opacity-50"></i>
+                <div class="mt-2">No symbols in watchlist</div>
+                <button class="btn btn-outline-primary btn-sm mt-2" onclick="addToWatchlist()">
+                    Add Symbol
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    watchlistSymbols.forEach(item => {
+        html += `
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary">
+                <div>
+                    <div class="fw-bold">${item.symbol}</div>
+                    <small class="text-muted">Alert: ±${item.threshold}%</small>
+                </div>
+                <div class="text-end">
+                    <div id="price-${item.symbol}" class="fw-bold">--</div>
+                    <button class="btn btn-outline-danger btn-sm" onclick="removeFromWatchlist('${item.symbol}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    
+    // Load current prices
+    updateWatchlistPrices();
+}
+
+function removeFromWatchlist(symbol) {
+    watchlistSymbols = watchlistSymbols.filter(item => item.symbol !== symbol);
+    localStorage.setItem('watchlist', JSON.stringify(watchlistSymbols));
+    loadWatchlist();
+    showAlert(`Removed ${symbol} from watchlist`, 'info');
+}
+
+function updateWatchlistPrices() {
+    watchlistSymbols.forEach(item => {
+        // This would typically make an API call to get real-time price
+        // For now, we'll show a placeholder
+        const priceElement = document.getElementById(`price-${item.symbol}`);
+        if (priceElement) {
+            priceElement.textContent = 'Loading...';
+        }
+    });
+}
+
+// Recent predictions
+function loadRecentPredictions() {
+    const container = document.getElementById('recent-predictions');
+    
+    if (recentPredictions.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-graph-up fs-1 opacity-50"></i>
+                <div class="mt-2">No recent predictions</div>
+                <button class="btn btn-outline-success btn-sm mt-2" onclick="showQuickPrediction()">
+                    Make Prediction
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    recentPredictions.slice(0, 3).forEach(prediction => {
+        const changeClass = prediction.change_percent >= 0 ? 'text-success' : 'text-danger';
+        const timeAgo = new Date(prediction.timestamp).toLocaleString();
+        
+        html += `
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary">
+                <div>
+                    <div class="fw-bold">${prediction.symbol}</div>
+                    <small class="text-muted">${timeAgo}</small>
+                </div>
+                <div class="text-end">
+                    <div class="${changeClass} fw-bold">
+                        ${prediction.change_percent >= 0 ? '+' : ''}${prediction.change_percent}%
+                    </div>
+                    <small class="text-muted">${prediction.confidence}% conf.</small>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function addToRecentPredictions(predictionData) {
+    const prediction = {
+        symbol: predictionData.symbol,
+        change_percent: predictionData.prediction.change_percent,
+        confidence: predictionData.prediction.confidence,
+        timestamp: new Date().toISOString()
+    };
+    
+    recentPredictions.unshift(prediction);
+    
+    // Keep only last 10 predictions
+    if (recentPredictions.length > 10) {
+        recentPredictions = recentPredictions.slice(0, 10);
+    }
+    
+    localStorage.setItem('recentPredictions', JSON.stringify(recentPredictions));
+    loadRecentPredictions();
+}
+
+// Performance chart
+function initializePerformanceChart() {
+    const ctx = document.getElementById('performance-chart').getContext('2d');
+    
+    performanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00'],
+            datasets: [{
+                label: 'Market Performance',
+                data: [0, 0.2, -0.1, 0.3, 0.5, 0.2, 0.4, 0.6, 0.3, 0.8, 1.2, 0.9, 1.1, 1.5],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#6c757d'
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#6c757d',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Utility functions
+function predictCrypto(symbol) {
+    // Close the crypto modal and open prediction with symbol
+    bootstrap.Modal.getInstance(document.getElementById('cryptoOverviewModal')).hide();
+    
+    setTimeout(() => {
+        document.getElementById('quick-symbol-input').value = symbol;
+        showQuickPrediction();
+    }, 300);
+}
+
+function setupPortfolio() {
+    showAlert('Portfolio setup will be available soon', 'info');
+}
+</script>
+{% endblock %}

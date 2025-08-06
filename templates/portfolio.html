@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio - FullStock AI vNext Ultimate{% endblock %}
+
+{% block extra_head %}
+<link href="/static/css/portfolio.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Portfolio Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-dark border-success portfolio-header">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="mb-1">
+                            <i class="fas fa-briefcase text-success me-2"></i>
+                            Portfolio Management
+                        </h2>
+                        <p class="text-muted mb-0">Track performance and get AI-powered insights</p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-success" id="addHoldingBtn">
+                            <i class="fas fa-plus me-1"></i>Add Holding
+                        </button>
+                        <button class="btn btn-outline-light ms-2" id="analyzePortfolioBtn">
+                            <i class="fas fa-chart-line me-1"></i>Analyze
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Portfolio Overview -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <div class="portfolio-stat">
+                    <div class="stat-value text-success" id="totalValue">$0.00</div>
+                    <div class="stat-label">Total Portfolio Value</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <div class="portfolio-stat">
+                    <div class="stat-value" id="totalGainLoss">$0.00</div>
+                    <div class="stat-label">Total Gain/Loss</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <div class="portfolio-stat">
+                    <div class="stat-value" id="portfolioChange">0.00%</div>
+                    <div class="stat-label">24h Change</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <div class="portfolio-stat">
+                    <div class="stat-value text-info" id="diversificationScore">0.0</div>
+                    <div class="stat-label">Diversification Score</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Holdings Table -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6><i class="fas fa-list me-2"></i>Holdings</h6>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-light" id="exportPortfolio">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="btn btn-outline-light" id="refreshPortfolio">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="holdingsContainer">
+                    <div class="empty-portfolio text-center text-muted py-5">
+                        <i class="fas fa-briefcase fa-3x mb-3"></i>
+                        <h5>Your portfolio is empty</h5>
+                        <p>Add your first holding to start tracking your investments</p>
+                        <button class="btn btn-success" onclick="$('#addHoldingBtn').click()">
+                            <i class="fas fa-plus me-1"></i>Add First Holding
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Portfolio Analysis -->
+<div class="row mb-4" id="portfolioAnalysis" style="display: none;">
+    <div class="col-md-8">
+        <div class="card bg-dark border-primary">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-pie me-2"></i>Portfolio Composition</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="portfolioChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header">
+                <h6><i class="fas fa-robot me-2"></i>AI Recommendations</h6>
+            </div>
+            <div class="card-body">
+                <div id="aiRecommendations">
+                    <div class="text-center">
+                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                        <div class="small mt-2">Generating insights...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance History -->
+<div class="row mb-4" id="performanceSection" style="display: none;">
+    <div class="col-12">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6><i class="fas fa-chart-line me-2"></i>Performance History</h6>
+                <div class="btn-group btn-group-sm" role="group">
+                    <input type="radio" class="btn-check" name="timeframe" id="tf1d" autocomplete="off" checked>
+                    <label class="btn btn-outline-light" for="tf1d">1D</label>
+                    
+                    <input type="radio" class="btn-check" name="timeframe" id="tf1w" autocomplete="off">
+                    <label class="btn btn-outline-light" for="tf1w">1W</label>
+                    
+                    <input type="radio" class="btn-check" name="timeframe" id="tf1m" autocomplete="off">
+                    <label class="btn btn-outline-light" for="tf1m">1M</label>
+                    
+                    <input type="radio" class="btn-check" name="timeframe" id="tf3m" autocomplete="off">
+                    <label class="btn btn-outline-light" for="tf3m">3M</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="performanceChart" width="400" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerts & Notifications -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6><i class="fas fa-bell me-2"></i>Price Alerts</h6>
+                <button class="btn btn-sm btn-outline-primary" id="addAlertBtn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="alertsList">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                        <p>No active alerts</p>
+                        <small>Set price alerts to get notified of significant changes</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header">
+                <h6><i class="fas fa-history me-2"></i>Recent Activity</h6>
+            </div>
+            <div class="card-body">
+                <div id="recentActivity">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-history fa-2x mb-2"></i>
+                        <p>No recent activity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Backtesting -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-dark border-info">
+            <div class="card-header">
+                <h6><i class="fas fa-flask me-2"></i>Strategy Backtesting</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="backtest-form">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Symbol</label>
+                                    <input type="text" class="form-control bg-dark border-secondary text-light" 
+                                           id="backtestSymbol" placeholder="AAPL">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Strategy</label>
+                                    <select class="form-select bg-dark border-secondary text-light" id="backtestStrategy">
+                                        <option value="sma_crossover">SMA Crossover</option>
+                                        <option value="rsi_reversal">RSI Reversal</option>
+                                        <option value="macd_divergence">MACD Divergence</option>
+                                        <option value="bollinger_bands">Bollinger Bands</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" class="form-control bg-dark border-secondary text-light" 
+                                           id="backtestStartDate">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" class="form-control bg-dark border-secondary text-light" 
+                                           id="backtestEndDate">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button class="btn btn-info d-block" id="runBacktest">
+                                        <i class="fas fa-play me-1"></i>Run Test
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div id="backtestResults" style="display: none;">
+                            <div class="backtest-result">
+                                <div class="result-metric">
+                                    <span class="metric-label">Total Return:</span>
+                                    <span class="metric-value" id="backtestReturn">0%</span>
+                                </div>
+                                <div class="result-metric">
+                                    <span class="metric-label">Max Drawdown:</span>
+                                    <span class="metric-value" id="backtestDrawdown">0%</span>
+                                </div>
+                                <div class="result-metric">
+                                    <span class="metric-label">Sharpe Ratio:</span>
+                                    <span class="metric-value" id="backtestSharpe">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Holding Modal -->
+<div class="modal fade" id="addHoldingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Add New Holding</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addHoldingForm">
+                    <div class="mb-3">
+                        <label class="form-label">Symbol</label>
+                        <input type="text" class="form-control bg-dark border-secondary text-light" 
+                               id="holdingSymbol" placeholder="AAPL" required>
+                        <div class="form-text">Enter stock symbol or crypto (e.g., BTC, ETH)</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" step="0.0001" class="form-control bg-dark border-secondary text-light" 
+                                       id="holdingQuantity" placeholder="10" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Purchase Price</label>
+                                <input type="number" step="0.01" class="form-control bg-dark border-secondary text-light" 
+                                       id="holdingPrice" placeholder="150.00" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Purchase Date</label>
+                        <input type="date" class="form-control bg-dark border-secondary text-light" 
+                               id="holdingDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Asset Type</label>
+                        <select class="form-select bg-dark border-secondary text-light" id="holdingType">
+                            <option value="stock">Stock</option>
+                            <option value="crypto">Cryptocurrency</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="saveHoldingBtn">
+                    <i class="fas fa-save me-1"></i>Add Holding
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Alert Modal -->
+<div class="modal fade" id="addAlertModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Create Price Alert</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAlertForm">
+                    <div class="mb-3">
+                        <label class="form-label">Symbol</label>
+                        <input type="text" class="form-control bg-dark border-secondary text-light" 
+                               id="alertSymbol" placeholder="AAPL" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Alert Type</label>
+                        <select class="form-select bg-dark border-secondary text-light" id="alertType" required>
+                            <option value="price_above">Price Above</option>
+                            <option value="price_below">Price Below</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Threshold Price</label>
+                        <input type="number" step="0.01" class="form-control bg-dark border-secondary text-light" 
+                               id="alertThreshold" placeholder="200.00" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveAlertBtn">
+                    <i class="fas fa-bell me-1"></i>Create Alert
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/portfolio.js"></script>
+{% endblock %}
