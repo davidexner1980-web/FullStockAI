@@ -14,7 +14,7 @@ class User(UserMixin, db.Model):
     # Relationships
     watchlists = db.relationship('Watchlist', backref='user', lazy='dynamic')
     portfolios = db.relationship('Portfolio', backref='user', lazy='dynamic')
-    alerts = db.relationship('Alert', backref='user', lazy='dynamic')
+    alerts = db.relationship('PriceAlert', backref='user', lazy='dynamic')
 
 class Watchlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,13 +26,15 @@ class Watchlist(db.Model):
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    ticker = db.Column(db.String(10), nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    purchase_price = db.Column(db.Float, nullable=False)
-    purchase_date = db.Column(db.DateTime, default=datetime.utcnow)
-    is_crypto = db.Column(db.Boolean, default=False)
+    name = db.Column(db.String(100), nullable=False, default='My Portfolio')
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    
+    # Relationships
+    holdings = db.relationship('PortfolioHolding', backref='portfolio', lazy='dynamic')
 
-class Alert(db.Model):
+class PriceAlert(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     ticker = db.Column(db.String(10), nullable=False)
@@ -41,6 +43,16 @@ class Alert(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     triggered_at = db.Column(db.DateTime)
+
+class PortfolioHolding(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    portfolio_id = db.Column(db.Integer, db.ForeignKey('portfolio.id'), nullable=False)
+    ticker = db.Column(db.String(10), nullable=False)
+    quantity = db.Column(db.Float, nullable=False)
+    purchase_price = db.Column(db.Float, nullable=False)
+    current_price = db.Column(db.Float)
+    purchase_date = db.Column(db.DateTime, default=datetime.utcnow)
+    is_crypto = db.Column(db.Boolean, default=False)
 
 class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
