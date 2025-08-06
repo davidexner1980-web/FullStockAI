@@ -3,10 +3,20 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler
 import xgboost as xgb
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
 from data_fetcher import DataFetcher
 import logging
+
+# Conditional TensorFlow imports - won't crash app if TensorFlow has issues
+try:
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import LSTM, Dense, Dropout
+    TENSORFLOW_AVAILABLE = True
+    logging.info("TensorFlow loaded successfully for crypto predictions")
+except Exception as e:
+    logging.warning(f"TensorFlow not available for LSTM models: {str(e)}")
+    Sequential = None
+    LSTM = Dense = Dropout = None
+    TENSORFLOW_AVAILABLE = False
 
 class CryptoPredictorEngine:
     def __init__(self):
@@ -132,8 +142,13 @@ class CryptoPredictorEngine:
             raise
 
     def predict_lstm(self, ticker):
-        """LSTM prediction for crypto"""
+        """LSTM prediction for crypto (with TensorFlow fallback)"""
         try:
+            # Check if TensorFlow is available
+            if not TENSORFLOW_AVAILABLE:
+                logging.warning("TensorFlow not available, falling back to advanced time series prediction")
+                return self._lstm_fallback_prediction(ticker)
+            
             # Ensure crypto ticker format
             if not ticker.endswith('-USD'):
                 ticker = f"{ticker}-USD"
@@ -200,6 +215,61 @@ class CryptoPredictorEngine:
             }
         except Exception as e:
             logging.error(f"Crypto LSTM prediction error for {ticker}: {str(e)}")
+            # Try fallback method if TensorFlow LSTM fails
+            logging.info("Attempting LSTM fallback prediction...")
+            return self._lstm_fallback_prediction(ticker)
+    
+    def _lstm_fallback_prediction(self, ticker):
+        """Fallback prediction when TensorFlow LSTM is not available"""
+        try:
+            # Ensure crypto ticker format
+            if not ticker.endswith('-USD'):
+                ticker = f"{ticker}-USD"
+            
+            # Get crypto data
+            df = self.data_fetcher.get_crypto_data(ticker, period='6m')
+            if df.empty:
+                raise ValueError(f"No data available for {ticker}")
+            
+            # Prepare features for advanced time series analysis
+            df = self.prepare_crypto_features(df)
+            
+            # Use weighted moving averages to simulate LSTM-like behavior
+            weights = np.array([0.1, 0.2, 0.3, 0.4])  # More weight on recent data
+            prices = df['Close'].values
+            
+            # Calculate weighted prediction based on recent trends and patterns
+            if len(prices) < 10:
+                raise ValueError("Insufficient data for fallback prediction")
+            
+            # Trend analysis
+            recent_4 = prices[-4:]
+            weighted_avg = np.average(recent_4, weights=weights)
+            
+            # Momentum calculation
+            momentum_5 = (prices[-1] - prices[-5]) / prices[-5] if len(prices) >= 5 else 0
+            momentum_10 = (prices[-1] - prices[-10]) / prices[-10] if len(prices) >= 10 else 0
+            
+            # Combine weighted average with momentum
+            momentum_factor = (momentum_5 * 0.7 + momentum_10 * 0.3) * 0.1
+            predicted_price = weighted_avg * (1 + momentum_factor)
+            
+            current_price = prices[-1]
+            price_change = ((predicted_price - current_price) / current_price) * 100
+            
+            # Calculate confidence based on recent stability
+            recent_volatility = df['Volatility'].iloc[-7:].mean()
+            confidence = min(75, max(50, 65 - (recent_volatility * 10)))
+            
+            return {
+                'predicted_price': round(predicted_price, 6),
+                'current_price': round(current_price, 6),
+                'price_change_percent': round(price_change, 2),
+                'confidence': round(confidence, 1),
+                'model_type': 'Advanced Time Series (LSTM Fallback)'
+            }
+        except Exception as e:
+            logging.error(f"LSTM fallback prediction error for {ticker}: {str(e)}")
             raise
 
     def predict_xgboost(self, ticker):

@@ -10,6 +10,21 @@ import os
 import logging
 import random
 
+# TensorFlow availability flag for fallbacks
+TENSORFLOW_AVAILABLE = False
+try:
+    # Test import without actually importing to avoid startup crash
+    import importlib.util
+    if importlib.util.find_spec("tensorflow") is not None:
+        # Only import if TensorFlow can be loaded safely
+        import tensorflow as tf
+        tf.config.set_visible_devices([], 'GPU')  # Disable GPU to avoid CUDA issues
+        TENSORFLOW_AVAILABLE = True
+        logging.info("TensorFlow available for LSTM models")
+except Exception as e:
+    logging.warning(f"TensorFlow not available: {str(e)}")
+    TENSORFLOW_AVAILABLE = False
+
 class MLModelManager:
     def __init__(self):
         self.data_fetcher = DataFetcher()

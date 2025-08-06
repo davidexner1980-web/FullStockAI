@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from flask_mail import Message
 from app import mail, socketio
 import smtplib
-from email.mime.text import MimeText
+from email.mime.text import MIMEText
 import yfinance as yf
 
 class NotificationService:

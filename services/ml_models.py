@@ -5,12 +5,26 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 import xgboost as xgb
-from tensorflow import keras
-from tensorflow.keras import layers
 import logging
 import joblib
 import os
 from datetime import datetime
+
+# Conditional TensorFlow imports - prevent startup crashes
+TENSORFLOW_AVAILABLE = False
+keras = None
+layers = None
+try:
+    import tensorflow as tf
+    from tensorflow import keras
+    from tensorflow.keras import layers
+    TENSORFLOW_AVAILABLE = True
+    logging.info("TensorFlow loaded successfully for ML models")
+except ImportError as e:
+    logging.warning(f"TensorFlow not available: {str(e)}")
+except Exception as e:
+    logging.warning(f"TensorFlow failed to load: {str(e)}")
+    TENSORFLOW_AVAILABLE = False
 
 class MLModelManager:
     """Enhanced ML model manager with XGBoost and improved LSTM"""
