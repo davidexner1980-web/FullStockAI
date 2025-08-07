@@ -10,6 +10,30 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
+### MASTER BUILD Folder Structure (Updated 2025-08-07)
+```
+/project-root/
+├── server/                    (Main server directory)
+│   ├── api/                   (Flask routes and endpoints)
+│   ├── models/                (Trained ML model binaries)
+│   ├── ml/                    (ML pipeline and data fetching)
+│   ├── tasks/                 (Background tasks - APScheduler)
+│   ├── utils/                 (Services and strategic modules)
+│   ├── static/                (CSS, JS, PWA assets)
+│   ├── templates/             (Jinja2 HTML templates)
+│   ├── app.py                 (Main Flask application)
+│   ├── config.py              (Environment configuration)
+│   └── scheduler.py           (Background task scheduler)
+├── frontend/                  (Standalone frontend assets)
+│   ├── js/                    (Advanced JavaScript modules)
+│   ├── css/                   (Responsive Bootstrap styling)
+│   └── index.html             (Complete UI implementation)
+├── docs/                      (System documentation and reports)
+├── database/                  (Data storage and logs)
+├── .replit                    (Replit configuration)
+└── main.py                    (Application entry point)
+```
+
 ### Frontend Architecture
 - **Framework**: Flask-based web application with Bootstrap 5 dark theme
 - **UI Design**: Modern responsive card-based layout with mobile-first approach
@@ -20,7 +44,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Architecture
 - **Web Framework**: Flask with SQLAlchemy ORM using DeclarativeBase
-- **Database**: SQLite with fallback configuration (supports PostgreSQL via DATABASE_URL)
+- **Database**: PostgreSQL with SQLite fallback configuration (via DATABASE_URL)
 - **Caching**: Flask-Caching with SimpleCache for performance optimization
 - **Background Tasks**: APScheduler for periodic model updates and market data refresh
 - **WebSocket Support**: Flask-SocketIO for real-time communication
