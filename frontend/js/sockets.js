@@ -13,11 +13,15 @@ let reconnectInterval = null;
  */
 function initializeWebSocket() {
     try {
-        // Connect to Socket.IO server
+        // Connect to Socket.IO server with fallback to polling for sync workers
         socket = io({
-            transports: ['websocket', 'polling'],
-            upgrade: true,
-            rememberUpgrade: true
+            transports: ['polling', 'websocket'],
+            upgrade: false,
+            forceNew: true,
+            timeout: 5000,
+            reconnection: true,
+            reconnectionDelay: 2000,
+            reconnectionAttempts: 3
         });
         
         setupSocketEventListeners();
@@ -25,7 +29,9 @@ function initializeWebSocket() {
         
     } catch (error) {
         console.error('WebSocket initialization error:', error);
-        updateConnectionStatus('error', 'Connection Failed');
+        updateConnectionStatus('warning', 'HTTP Mode');
+        // Gracefully degrade to HTTP-only mode
+        fallbackToHttpMode();
     }
 }
 
@@ -339,12 +345,49 @@ function cleanupWebSocket() {
     }
 }
 
+/**
+ * Fallback to HTTP-only mode when WebSocket fails
+ */
+function fallbackToHttpMode() {
+    console.log('Falling back to HTTP-only mode');
+    updateConnectionStatus('warning', 'HTTP Only');
+    
+    // Disable socket-based features
+    socket = null;
+    
+    // Set up periodic HTTP polling for live updates
+    if (window.currentTicker) {
+        setInterval(() => {
+            fetchPredictionUpdate(window.currentTicker);
+        }, 30000); // Poll every 30 seconds
+    }
+}
+
+/**
+ * Fetch prediction update via HTTP when WebSocket unavailable
+ */
+async function fetchPredictionUpdate(ticker) {
+    try {
+        const response = await fetch(`/api/predict/${ticker}`);
+        const data = await response.json();
+        if (data && !data.error) {
+            handlePredictionUpdate(data);
+            if (typeof updateLiveUpdates === 'function') {
+                updateLiveUpdates(`📊 Updated ${ticker} via HTTP: $${data.current_price.toFixed(2)}`);
+            }
+        }
+    } catch (error) {
+        console.error('HTTP prediction update failed:', error);
+    }
+}
+
 // Export functions for global access
 window.initializeWebSocket = initializeWebSocket;
 window.requestLiveData = requestLiveData;
 window.unsubscribeTicker = unsubscribeTicker;
 window.sendSocketMessage = sendSocketMessage;
 window.cleanupWebSocket = cleanupWebSocket;
+window.fallbackToHttpMode = fallbackToHttpMode;
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', cleanupWebSocket);
