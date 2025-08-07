@@ -46,7 +46,10 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 
 # Initialize extensions
 db.init_app(app)
-socketio.init_app(app, cors_allowed_origins="*")
+socketio.init_app(app, 
+                 cors_allowed_origins="*",
+                 logger=True,
+                 engineio_logger=False)
 cache.init_app(app)
 mail.init_app(app)
 
