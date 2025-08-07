@@ -13,15 +13,19 @@ let reconnectInterval = null;
  */
 function initializeWebSocket() {
     try {
-        // Connect to Socket.IO server with fallback to polling for sync workers
+        // Connect to Socket.IO server with optimized transport settings
         socket = io({
-            transports: ['polling', 'websocket'],
-            upgrade: false,
-            forceNew: true,
-            timeout: 5000,
+            transports: ['websocket', 'polling'],
+            upgrade: true,
+            forceNew: false,
+            timeout: 10000,
             reconnection: true,
-            reconnectionDelay: 2000,
-            reconnectionAttempts: 3
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            reconnectionAttempts: 10,
+            maxReconnectionAttempts: 10,
+            pingTimeout: 60000,
+            pingInterval: 25000
         });
         
         setupSocketEventListeners();
