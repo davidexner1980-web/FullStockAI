@@ -9,33 +9,44 @@ import logging
 import joblib
 import os
 from datetime import datetime
+from typing import Optional, Dict, Any, Union
 
 # Conditional TensorFlow imports - prevent startup crashes
 TENSORFLOW_AVAILABLE = False
+tf = None
 keras = None
 layers = None
-try:
-    import tensorflow as tf
-    from tensorflow import keras
-    from tensorflow.keras import layers
-    TENSORFLOW_AVAILABLE = True
-    logging.info("TensorFlow loaded successfully for ML models")
-except ImportError as e:
-    logging.warning(f"TensorFlow not available: {str(e)}")
-except Exception as e:
-    logging.warning(f"TensorFlow failed to load: {str(e)}")
-    TENSORFLOW_AVAILABLE = False
+
+def _load_tensorflow():
+    """Safely load TensorFlow with comprehensive error handling"""
+    global TENSORFLOW_AVAILABLE, tf, keras, layers
+    try:
+        import tensorflow as tf_module
+        tf = tf_module
+        keras = tf_module.keras
+        layers = tf_module.keras.layers
+        TENSORFLOW_AVAILABLE = True
+        logging.info("TensorFlow loaded successfully for ML models")
+        return True
+    except ImportError as e:
+        logging.warning(f"TensorFlow not available: {str(e)}")
+        return False
+    except Exception as e:
+        logging.warning(f"TensorFlow failed to load: {str(e)}")
+        return False
+
+# Don't load TensorFlow during import - will be loaded lazily when needed
 
 class MLModelManager:
     """Enhanced ML model manager with XGBoost and improved LSTM"""
     
     def __init__(self):
-        self.models = {
+        self.models: Dict[str, Optional[Any]] = {
             'random_forest': None,
             'xgboost': None,
             'lstm': None
         }
-        self.scalers = {
+        self.scalers: Dict[str, Any] = {
             'features': StandardScaler(),
             'target': MinMaxScaler()
         }
@@ -67,7 +78,7 @@ class MLModelManager:
                     return None, None
             
             # Extract features and target with proper forward-fill
-            features = df[available_features].fillna(method='ffill').fillna(0)
+            features = df[available_features].ffill().fillna(0)
             target = df['Close'].shift(-1).fillna(df['Close'].iloc[-1])
             
             # Remove last row as it doesn't have a target
@@ -253,7 +264,11 @@ class MLModelManager:
             return False
     
     def train_lstm(self, data, sequence_length=60):
-        """Train LSTM model"""
+        """Train LSTM model - only if TensorFlow is available"""
+        if not TENSORFLOW_AVAILABLE:
+            logging.warning("LSTM training skipped: TensorFlow not available")
+            return False
+            
         try:
             # Prepare data for LSTM
             close_prices = data['Close'].values.reshape(-1, 1)
