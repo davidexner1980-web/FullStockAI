@@ -95,7 +95,7 @@ class FullStockApp {
 
         } catch (error) {
             console.error('Analysis error:', error);
-            this.showError(`Analysis failed: ${error.message}`);
+            this.showError(`Analysis failed: ${error.message || 'Unknown error'}`);
         } finally {
             this.state.isLoading = false;
             this.showLoading(false);
@@ -147,69 +147,88 @@ class FullStockApp {
     }
 
     updatePredictionDisplay(data) {
+        console.log('Updating prediction display with data:', data);
+        
         // Current price
-        document.getElementById('currentPrice').textContent = `$${data.current_price?.toFixed(2) || '--'}`;
+        const currentPriceEl = document.getElementById('currentPrice');
+        if (currentPriceEl && data.current_price) {
+            currentPriceEl.textContent = `$${data.current_price.toFixed(2)}`;
+        }
         
         // Price change
         const change = data.price_change || 0;
         const changePercent = data.change_percent || 0;
         const changeElement = document.getElementById('priceChange');
-        changeElement.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent.toFixed(2)}%)`;
-        changeElement.className = change >= 0 ? 'text-success' : 'text-danger';
+        if (changeElement) {
+            changeElement.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent.toFixed(2)}%)`;
+            changeElement.className = change >= 0 ? 'text-success' : 'text-danger';
+        }
 
         // Individual model predictions
         if (data.predictions) {
-            // Random Forest
-            const rfPrediction = data.predictions.random_forest?.prediction || data.predictions.random_forest;
-            document.getElementById('rfPrediction').textContent = 
-                rfPrediction ? `$${rfPrediction.toFixed(2)}` : '--';
-            document.getElementById('rfConfidence').textContent = 
-                data.predictions.random_forest?.confidence ? `${(data.predictions.random_forest.confidence * 100).toFixed(1)}% confidence` : '--';
-
-            // XGBoost
-            const xgbPrediction = data.predictions.xgboost?.prediction || data.predictions.xgboost;
-            document.getElementById('xgbPrediction').textContent = 
-                xgbPrediction ? `$${xgbPrediction.toFixed(2)}` : '--';
-            document.getElementById('xgbConfidence').textContent = 
-                data.predictions.xgboost?.confidence ? `${(data.predictions.xgboost.confidence * 100).toFixed(1)}% confidence` : '--';
-
-            // LSTM
-            const lstmPrediction = data.predictions.lstm?.prediction || data.predictions.lstm;
-            const lstmElement = document.getElementById('lstmPrediction');
-            const lstmConfElement = document.getElementById('lstmConfidence');
+            console.log('Updating individual predictions:', data.predictions);
             
-            if (lstmElement) {
-                if (data.predictions.lstm && !data.predictions.lstm.error && typeof lstmPrediction === 'number') {
-                    lstmElement.textContent = `$${lstmPrediction.toFixed(2)}`;
-                } else {
-                    lstmElement.textContent = 'Unavailable';
+            // Random Forest
+            const rfElement = document.getElementById('rfPrediction');
+            const rfConfElement = document.getElementById('rfConfidence');
+            if (rfElement && data.predictions.random_forest) {
+                const rfPrediction = data.predictions.random_forest.prediction;
+                const rfConfidence = data.predictions.random_forest.confidence;
+                rfElement.textContent = rfPrediction ? `$${rfPrediction.toFixed(2)}` : '--';
+                if (rfConfElement) {
+                    rfConfElement.textContent = rfConfidence ? `${(rfConfidence * 100).toFixed(1)}% confidence` : '--';
                 }
             }
-            
-            if (lstmConfElement) {
-                if (data.predictions.lstm?.confidence) {
-                    lstmConfElement.textContent = `${(data.predictions.lstm.confidence * 100).toFixed(1)}% confidence`;
+
+            // XGBoost
+            const xgbElement = document.getElementById('xgbPrediction');
+            const xgbConfElement = document.getElementById('xgbConfidence');
+            if (xgbElement && data.predictions.xgboost) {
+                const xgbPrediction = data.predictions.xgboost.prediction;
+                const xgbConfidence = data.predictions.xgboost.confidence;
+                xgbElement.textContent = xgbPrediction ? `$${xgbPrediction.toFixed(2)}` : '--';
+                if (xgbConfElement) {
+                    xgbConfElement.textContent = xgbConfidence ? `${(xgbConfidence * 100).toFixed(1)}% confidence` : '--';
+                }
+            }
+
+            // LSTM
+            const lstmElement = document.getElementById('lstmPrediction');
+            const lstmConfElement = document.getElementById('lstmConfidence');
+            if (lstmElement) {
+                if (data.predictions.lstm && !data.predictions.lstm.error && data.predictions.lstm.prediction) {
+                    lstmElement.textContent = `$${data.predictions.lstm.prediction.toFixed(2)}`;
+                    if (lstmConfElement) {
+                        lstmConfElement.textContent = `${(data.predictions.lstm.confidence * 100).toFixed(1)}% confidence`;
+                    }
                 } else {
-                    lstmConfElement.textContent = 'TensorFlow compatibility issue';
+                    lstmElement.textContent = 'Unavailable';
+                    if (lstmConfElement) {
+                        lstmConfElement.textContent = 'TensorFlow compatibility issue';
+                    }
                 }
             }
         }
 
         // Ensemble prediction
-        const ensemblePred = data.predictions?.ensemble?.prediction || data.ensemble_prediction;
-        const ensembleConf = data.predictions?.ensemble?.confidence || data.ensemble_confidence || 0.75;
-        
         const ensembleElement = document.getElementById('ensemblePrediction');
         const directionElement = document.getElementById('ensembleDirection');
         
-        if (ensembleElement && ensemblePred) {
-            ensembleElement.textContent = `$${ensemblePred.toFixed(2)}`;
+        if (ensembleElement && data.predictions?.ensemble) {
+            const ensemblePred = data.predictions.ensemble.prediction;
+            const ensembleConf = data.predictions.ensemble.confidence;
             
-            if (directionElement) {
-                const direction = ensemblePred > data.current_price ? 'BULLISH' : 'BEARISH';
-                const directionClass = direction === 'BULLISH' ? 'text-success' : 'text-danger';
-                directionElement.innerHTML = 
-                    `<span class="${directionClass}">${direction}</span> - ${(ensembleConf * 100).toFixed(1)}% confidence`;
+            console.log('Updating ensemble prediction:', ensemblePred, ensembleConf);
+            
+            if (ensemblePred) {
+                ensembleElement.textContent = `$${ensemblePred.toFixed(2)}`;
+                
+                if (directionElement && data.current_price) {
+                    const direction = ensemblePred > data.current_price ? 'BULLISH' : 'BEARISH';
+                    const directionClass = direction === 'BULLISH' ? 'text-success' : 'text-danger';
+                    directionElement.innerHTML = 
+                        `<span class="${directionClass}">${direction}</span> - ${(ensembleConf * 100).toFixed(1)}% confidence`;
+                }
             }
         }
     }
@@ -327,24 +346,28 @@ class FullStockApp {
     }
 
     showError(message) {
+        console.error('Showing error:', message);
+        
         // Create error alert
         const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show mx-3 mt-3';
         alertDiv.innerHTML = `
-            ${message}
+            <strong>Error:</strong> ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
 
         // Insert after navigation
         const nav = document.querySelector('nav');
-        nav.insertAdjacentElement('afterend', alertDiv);
+        if (nav) {
+            nav.insertAdjacentElement('afterend', alertDiv);
+        }
 
-        // Auto-remove after 5 seconds
+        // Auto-remove after 10 seconds
         setTimeout(() => {
             if (alertDiv.parentNode) {
                 alertDiv.remove();
             }
-        }, 5000);
+        }, 10000);
     }
 
     handlePriceUpdate(data) {
