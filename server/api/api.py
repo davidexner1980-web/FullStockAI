@@ -66,19 +66,25 @@ def predict(ticker):
         
         # Filter successful predictions
         successful_predictions = []
-        ensemble_confidence = 0
+        ensemble_confidence = 0.0
         
         if isinstance(rf_prediction, dict) and 'prediction' in rf_prediction and 'error' not in rf_prediction:
             successful_predictions.append(rf_prediction['prediction'])
-            ensemble_confidence += rf_prediction.get('confidence', 0.5)
+            confidence = rf_prediction.get('confidence', 0.5)
+            if isinstance(confidence, (int, float)):
+                ensemble_confidence += float(confidence)
         
         if isinstance(xgb_prediction, dict) and 'prediction' in xgb_prediction and 'error' not in xgb_prediction:
             successful_predictions.append(xgb_prediction['prediction'])
-            ensemble_confidence += xgb_prediction.get('confidence', 0.5)
+            confidence = xgb_prediction.get('confidence', 0.5)
+            if isinstance(confidence, (int, float)):
+                ensemble_confidence += float(confidence)
         
         if isinstance(lstm_prediction, dict) and 'prediction' in lstm_prediction and 'error' not in lstm_prediction:
             successful_predictions.append(lstm_prediction['prediction'])
-            ensemble_confidence += lstm_prediction.get('confidence', 0.5)
+            confidence = lstm_prediction.get('confidence', 0.5)
+            if isinstance(confidence, (int, float)):
+                ensemble_confidence += float(confidence)
         
         if not successful_predictions:
             return jsonify({'error': 'All prediction models failed'}), 500

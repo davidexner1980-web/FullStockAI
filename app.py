@@ -95,5 +95,4 @@ scheduler.add_job(
     id='health_check'
 )
 
-# Import routes to register them with Flask
-import routes
+# Routes are handled by server/api blueprints

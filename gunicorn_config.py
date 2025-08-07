@@ -5,11 +5,11 @@ import multiprocessing
 bind = "0.0.0.0:5000"
 backlog = 2048
 
-# Worker processes
+# Worker processes  
 workers = 1  # Flask-SocketIO works best with 1 worker
 worker_class = "eventlet"  # Use eventlet for WebSocket support
 worker_connections = 1000
-timeout = 120  # Increased timeout for WebSocket connections
+timeout = 30  # Standard timeout
 keepalive = 2
 
 # Restart workers

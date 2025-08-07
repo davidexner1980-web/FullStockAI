@@ -1,43 +1,40 @@
 from flask import render_template, request, jsonify, session, redirect, url_for
 from flask_socketio import emit
 from app import app, db, cache, socketio
-from models import User, Portfolio, PortfolioHolding, Watchlist, PriceAlert, Prediction, BacktestResult
-from ml_models import MLModelManager
-from backend.data_fetcher import DataFetcher
-from sentiment_analyzer import SentimentAnalyzer
-from trading_strategies import TradingStrategies
-from oracle_engine import OracleEngine
-from backend.crypto_predictor import CryptoPredictorEngine
-from portfolio_manager import PortfolioManager
-from backtesting_engine import BacktestingEngine
-from notification_service import NotificationService
-from strategic.oracle_dreams import OracleDreams
-from strategic.curiosity_engine import CuriosityEngine
-from strategic.health_monitor import HealthMonitor
-from strategic.explainer_service import ExplainerService
-from strategic.quantum_forecast import QuantumForecast
-from strategic.portfolio_optimizer import PortfolioOptimizer
+from models import User
 import json
 import logging
 
-# Initialize services
-ml_manager = MLModelManager()
-data_fetcher = DataFetcher()
-sentiment_analyzer = SentimentAnalyzer()
-trading_strategies = TradingStrategies()
-oracle_engine = OracleEngine()
-crypto_predictor = CryptoPredictorEngine()
-portfolio_manager = PortfolioManager()
-backtesting_engine = BacktestingEngine()
-notification_service = NotificationService()
+# Import only available modules
+try:
+    from data_fetcher import DataFetcher
+    data_fetcher = DataFetcher()
+except ImportError:
+    data_fetcher = None
 
-# Strategic services
-oracle_dreams = OracleDreams()
-curiosity_engine = CuriosityEngine()
-health_monitor = HealthMonitor()
-explainer_service = ExplainerService()
-quantum_forecast = QuantumForecast()
-portfolio_optimizer = PortfolioOptimizer()
+try:
+    from sentiment_analyzer import SentimentAnalyzer
+    sentiment_analyzer = SentimentAnalyzer()
+except ImportError:
+    sentiment_analyzer = None
+
+try:
+    from oracle_engine import OracleEngine
+    oracle_engine = OracleEngine()
+except ImportError:
+    oracle_engine = None
+
+try:
+    from crypto_predictor import CryptoPredictorEngine
+    crypto_predictor = CryptoPredictorEngine()
+except ImportError:
+    crypto_predictor = None
+
+try:
+    from notification_service import NotificationService
+    notification_service = NotificationService()
+except ImportError:
+    notification_service = None
 
 @app.route('/')
 def index():
