@@ -36,119 +36,70 @@ quantum_forecast = QuantumForecast()
 @api_bp.route('/predict/<ticker>')
 @cache.cached(timeout=300)
 def predict(ticker):
-    """Fast prediction endpoint with timeout protection"""
+    """Main prediction endpoint with all models"""
     try:
         ticker = ticker.upper()
-        logging.info(f"Starting prediction for {ticker}")
         
-        # Get data with timeout
+        # Get data
         data = data_fetcher.get_stock_data(ticker)
-        if data is None or data.empty:
+        if data is None:
             return jsonify({'error': 'Failed to fetch data for ticker'}), 400
         
-        current_price = float(data['Close'].iloc[-1])
-        logging.info(f"Current price for {ticker}: {current_price}")
-        
-        # Quick technical analysis predictions (always available)
-        sma_20 = data['Close'].rolling(20).mean().iloc[-1]
-        sma_50 = data['Close'].rolling(50).mean().iloc[-1]
-        
-        # Simple trend-based predictions
-        trend_prediction = current_price * 1.02 if current_price > sma_20 else current_price * 0.98
-        momentum_prediction = current_price + (current_price - sma_50) * 0.1
-        
-        # Try ML models with quick timeouts
-        predictions = {}
-        
-        # Random Forest (fastest)
+        # Get predictions from all models (handle failures gracefully)
         try:
-            rf_result = ml_manager.predict_random_forest(data)
-            if isinstance(rf_result, dict) and 'prediction' in rf_result:
-                predictions['random_forest'] = rf_result
-                logging.info(f"RF prediction: {rf_result['prediction']}")
-            else:
-                predictions['random_forest'] = {
-                    'prediction': trend_prediction,
-                    'confidence': 0.044444444444444446,
-                    'model': 'Random Forest (fallback)'
-                }
+            rf_prediction = ml_manager.predict_random_forest(data)
         except Exception as e:
-            logging.error(f"Random Forest failed: {e}")
-            predictions['random_forest'] = {
-                'prediction': trend_prediction,
-                'confidence': 0.044444444444444446,
-                'model': 'Random Forest (fallback)'
-            }
+            logging.error(f"Random Forest prediction failed: {str(e)}")
+            rf_prediction = {'error': f'Random Forest failed: {str(e)}'}
         
-        # XGBoost (medium speed)
         try:
-            xgb_result = ml_manager.predict_xgboost(data)
-            if isinstance(xgb_result, dict) and 'prediction' in xgb_result:
-                predictions['xgboost'] = xgb_result
-                logging.info(f"XGBoost prediction: {xgb_result['prediction']}")
-            else:
-                predictions['xgboost'] = {
-                    'prediction': momentum_prediction,
-                    'confidence': 0.75,
-                    'model': 'XGBoost (fallback)'
-                }
+            lstm_prediction = ml_manager.predict_lstm(data)
         except Exception as e:
-            logging.error(f"XGBoost failed: {e}")
-            predictions['xgboost'] = {
-                'prediction': momentum_prediction,
-                'confidence': 0.75,
-                'model': 'XGBoost (fallback)'
-            }
+            logging.warning(f"LSTM prediction failed: {str(e)}")
+            lstm_prediction = {'error': f'LSTM failed: {str(e)}'}
         
-        # LSTM (skip if taking too long)
-        lstm_prediction_value = current_price * 0.985  # Conservative estimate
         try:
-            lstm_result = ml_manager.predict_lstm(data)
-            if isinstance(lstm_result, dict) and 'prediction' in lstm_result:
-                predictions['lstm'] = lstm_result
-                lstm_prediction_value = lstm_result['prediction']
-                logging.info(f"LSTM prediction: {lstm_result['prediction']}")
-            else:
-                predictions['lstm'] = {
-                    'prediction': lstm_prediction_value,
-                    'confidence': 0.89302338989251,
-                    'model': 'LSTM Neural Network (fallback)'
-                }
+            xgb_prediction = ml_manager.predict_xgboost(data)
         except Exception as e:
-            logging.error(f"LSTM failed: {e}")
-            predictions['lstm'] = {
-                'prediction': lstm_prediction_value,
-                'confidence': 0.89302338989251,
-                'model': 'LSTM Neural Network (fallback)'
-            }
+            logging.error(f"XGBoost prediction failed: {str(e)}")
+            xgb_prediction = {'error': f'XGBoost failed: {str(e)}'}
         
-        # Calculate ensemble from available predictions
-        all_predictions = [
-            predictions['random_forest']['prediction'],
-            predictions['xgboost']['prediction'], 
-            predictions['lstm']['prediction']
-        ]
+        # Filter successful predictions
+        successful_predictions = []
+        ensemble_confidence = 0
         
-        ensemble_pred = sum(all_predictions) / len(all_predictions)
-        ensemble_confidence = (
-            predictions['random_forest']['confidence'] +
-            predictions['xgboost']['confidence'] +
-            predictions['lstm']['confidence']
-        ) / 3
+        if isinstance(rf_prediction, dict) and 'prediction' in rf_prediction and 'error' not in rf_prediction:
+            successful_predictions.append(rf_prediction['prediction'])
+            ensemble_confidence += rf_prediction.get('confidence', 0.5)
         
-        # Calculate agreement level
-        if len(all_predictions) > 1:
-            agreement = 1.0 - (max(all_predictions) - min(all_predictions)) / max(all_predictions)
+        if isinstance(xgb_prediction, dict) and 'prediction' in xgb_prediction and 'error' not in xgb_prediction:
+            successful_predictions.append(xgb_prediction['prediction'])
+            ensemble_confidence += xgb_prediction.get('confidence', 0.5)
+        
+        if isinstance(lstm_prediction, dict) and 'prediction' in lstm_prediction and 'error' not in lstm_prediction:
+            successful_predictions.append(lstm_prediction['prediction'])
+            ensemble_confidence += lstm_prediction.get('confidence', 0.5)
+        
+        if not successful_predictions:
+            return jsonify({'error': 'All prediction models failed'}), 500
+        
+        # Ensemble prediction from successful models
+        ensemble_pred = sum(successful_predictions) / len(successful_predictions)
+        ensemble_confidence = ensemble_confidence / len(successful_predictions)
+        
+        # Calculate agreement level (only from successful predictions)
+        if len(successful_predictions) > 1:
+            agreement = 1.0 - (max(successful_predictions) - min(successful_predictions)) / max(successful_predictions)
         else:
-            agreement = 1.0
+            agreement = 1.0  # Single model, perfect agreement
         
         result = {
             'ticker': ticker,
-            'current_price': current_price,
+            'current_price': data['Close'].iloc[-1],
             'predictions': {
-                'random_forest': predictions['random_forest'],
-                'lstm': predictions['lstm'],
-                'xgboost': predictions['xgboost'],
+                'random_forest': rf_prediction,
+                'lstm': lstm_prediction,
+                'xgboost': xgb_prediction,
                 'ensemble': {
                     'prediction': ensemble_pred,
                     'confidence': ensemble_confidence

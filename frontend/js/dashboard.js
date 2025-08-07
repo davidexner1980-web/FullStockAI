@@ -94,15 +94,8 @@ async function analyzeStock(ticker) {
     showLoadingState();
     
     try {
-        // Fetch predictions with timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-        
-        const response = await fetch(`/api/predict/${ticker}`, {
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
+        // Fetch predictions from backend
+        const response = await fetch(`/api/predict/${ticker}`);
         
         if (!response.ok) {
             throw new Error(`API Error: ${response.status}`);
