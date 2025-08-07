@@ -1,6 +1,6 @@
 from app import db
-from datetime import datetime
 from flask_login import UserMixin
+from datetime import datetime
 import json
 
 class User(UserMixin, db.Model):
@@ -8,85 +8,54 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
-    profile_type = db.Column(db.String(20), default='moderate')  # conservative, moderate, aggressive
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    watchlists = db.relationship('Watchlist', backref='user', lazy='dynamic')
-    portfolios = db.relationship('Portfolio', backref='user', lazy='dynamic')
-    alerts = db.relationship('PriceAlert', backref='user', lazy='dynamic')
 
-class Watchlist(db.Model):
+class StockPrediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     ticker = db.Column(db.String(10), nullable=False)
-    added_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_crypto = db.Column(db.Boolean, default=False)
-
-class Portfolio(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    name = db.Column(db.String(100), nullable=False, default='My Portfolio')
-    description = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=True)
-    
-    # Relationships
-    holdings = db.relationship('PortfolioHolding', backref='portfolio', lazy='dynamic')
+    prediction_date = db.Column(db.DateTime, default=datetime.utcnow)
+    current_price = db.Column(db.Float, nullable=False)
+    predicted_price = db.Column(db.Float, nullable=False)
+    confidence = db.Column(db.Float, nullable=False)
+    model_type = db.Column(db.String(20), nullable=False)
+    features = db.Column(db.Text)  # JSON string of features used
 
 class PriceAlert(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     ticker = db.Column(db.String(10), nullable=False)
-    alert_type = db.Column(db.String(20), nullable=False)  # price_above, price_below, prediction_change
-    target_value = db.Column(db.Float, nullable=False)
+    target_price = db.Column(db.Float, nullable=False)
+    alert_type = db.Column(db.String(10), nullable=False)  # 'above' or 'below'
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    triggered_at = db.Column(db.DateTime)
-
-class PortfolioHolding(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    portfolio_id = db.Column(db.Integer, db.ForeignKey('portfolio.id'), nullable=False)
-    ticker = db.Column(db.String(10), nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    purchase_price = db.Column(db.Float, nullable=False)
-    current_price = db.Column(db.Float)
-    purchase_date = db.Column(db.DateTime, default=datetime.utcnow)
-    is_crypto = db.Column(db.Boolean, default=False)
-
-class Prediction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    ticker = db.Column(db.String(10), nullable=False)
-    model_type = db.Column(db.String(20), nullable=False)  # random_forest, lstm, xgboost
-    prediction_value = db.Column(db.Float, nullable=False)
-    confidence = db.Column(db.Float, nullable=False)
-    features_used = db.Column(db.Text)  # JSON string of features
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_crypto = db.Column(db.Boolean, default=False)
-
-class BacktestResult(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    strategy_name = db.Column(db.String(100), nullable=False)
-    ticker = db.Column(db.String(10), nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
-    initial_capital = db.Column(db.Float, nullable=False)
-    final_value = db.Column(db.Float, nullable=False)
-    total_return = db.Column(db.Float, nullable=False)
-    max_drawdown = db.Column(db.Float, nullable=False)
-    sharpe_ratio = db.Column(db.Float)
-    num_trades = db.Column(db.Integer)
-    win_rate = db.Column(db.Float)
-    results_data = db.Column(db.Text)  # JSON string of detailed results
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    triggered_date = db.Column(db.DateTime)
+    user_email = db.Column(db.String(120))
 
 class SystemHealth(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    cpu_usage = db.Column(db.Float)
-    memory_usage = db.Column(db.Float)
-    disk_usage = db.Column(db.Float)
-    api_status = db.Column(db.String(20))
-    data_freshness = db.Column(db.Integer)  # minutes since last update
-    overall_status = db.Column(db.String(20))  # OK, WARNING, ERROR
-    checked_at = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    component = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(20), nullable=False)  # 'healthy', 'warning', 'error'
+    metrics = db.Column(db.Text)  # JSON string of health metrics
+    message = db.Column(db.Text)
+
+class ModelPerformance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    model_name = db.Column(db.String(30), nullable=False)
+    evaluation_date = db.Column(db.DateTime, default=datetime.utcnow)
+    accuracy_score = db.Column(db.Float)
+    mse_score = db.Column(db.Float)
+    mae_score = db.Column(db.Float)
+    r2_score = db.Column(db.Float)
+    test_samples = db.Column(db.Integer)
+    training_samples = db.Column(db.Integer)
+    hyperparameters = db.Column(db.Text)  # JSON string
+
+class TradingSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    session_date = db.Column(db.DateTime, default=datetime.utcnow)
+    ticker = db.Column(db.String(10), nullable=False)
+    strategy = db.Column(db.String(50), nullable=False)
+    entry_price = db.Column(db.Float, nullable=False)
+    exit_price = db.Column(db.Float)
+    quantity = db.Column(db.Integer, nullable=False)
+    pnl = db.Column(db.Float)
+    status = db.Column(db.String(20), default='open')  # 'open', 'closed', 'cancelled'
