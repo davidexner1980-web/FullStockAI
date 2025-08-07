@@ -45,17 +45,39 @@ def predict(ticker):
         if data is None:
             return jsonify({'error': 'Failed to fetch data for ticker'}), 400
         
-        # Get predictions from all models
+        # Get predictions from all models (handle failures gracefully)
         rf_prediction = ml_manager.predict_random_forest(data)
         lstm_prediction = ml_manager.predict_lstm(data)
         xgb_prediction = ml_manager.predict_xgboost(data)
         
-        # Ensemble prediction
-        ensemble_pred = (rf_prediction['prediction'] + lstm_prediction['prediction'] + xgb_prediction['prediction']) / 3
+        # Filter successful predictions
+        successful_predictions = []
+        ensemble_confidence = 0
         
-        # Calculate agreement level
-        predictions = [rf_prediction['prediction'], lstm_prediction['prediction'], xgb_prediction['prediction']]
-        agreement = 1.0 - (max(predictions) - min(predictions)) / max(predictions)
+        if 'prediction' in rf_prediction and 'error' not in rf_prediction:
+            successful_predictions.append(rf_prediction['prediction'])
+            ensemble_confidence += rf_prediction.get('confidence', 0.5)
+        
+        if 'prediction' in xgb_prediction and 'error' not in xgb_prediction:
+            successful_predictions.append(xgb_prediction['prediction'])
+            ensemble_confidence += xgb_prediction.get('confidence', 0.5)
+        
+        if 'prediction' in lstm_prediction and 'error' not in lstm_prediction:
+            successful_predictions.append(lstm_prediction['prediction'])
+            ensemble_confidence += lstm_prediction.get('confidence', 0.5)
+        
+        if not successful_predictions:
+            return jsonify({'error': 'All prediction models failed'}), 500
+        
+        # Ensemble prediction from successful models
+        ensemble_pred = sum(successful_predictions) / len(successful_predictions)
+        ensemble_confidence = ensemble_confidence / len(successful_predictions)
+        
+        # Calculate agreement level (only from successful predictions)
+        if len(successful_predictions) > 1:
+            agreement = 1.0 - (max(successful_predictions) - min(successful_predictions)) / max(successful_predictions)
+        else:
+            agreement = 1.0  # Single model, perfect agreement
         
         result = {
             'ticker': ticker,
@@ -66,7 +88,7 @@ def predict(ticker):
                 'xgboost': xgb_prediction,
                 'ensemble': {
                     'prediction': ensemble_pred,
-                    'confidence': (rf_prediction['confidence'] + lstm_prediction['confidence'] + xgb_prediction['confidence']) / 3
+                    'confidence': ensemble_confidence
                 }
             },
             'agreement_level': agreement,
