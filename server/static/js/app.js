@@ -156,7 +156,11 @@ class FullStockApp {
         // Current price
         const currentPriceEl = document.getElementById('currentPrice');
         if (currentPriceEl && data.current_price) {
+            console.log('Setting current price:', data.current_price);
             currentPriceEl.textContent = `$${data.current_price.toFixed(2)}`;
+            console.log('Current price element text now:', currentPriceEl.textContent);
+        } else {
+            console.error('Current price element not found or no price data');
         }
         
         // Price change
@@ -178,10 +182,14 @@ class FullStockApp {
             if (rfElement && data.predictions.random_forest) {
                 const rfPrediction = data.predictions.random_forest.prediction;
                 const rfConfidence = data.predictions.random_forest.confidence;
+                console.log('Setting RF prediction:', rfPrediction);
                 rfElement.textContent = rfPrediction ? `$${rfPrediction.toFixed(2)}` : '--';
+                console.log('RF element text now:', rfElement.textContent);
                 if (rfConfElement) {
                     rfConfElement.textContent = rfConfidence ? `${(rfConfidence * 100).toFixed(1)}% confidence` : '--';
                 }
+            } else {
+                console.error('RF element not found or no RF data');
             }
 
             // XGBoost

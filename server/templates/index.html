@@ -249,10 +249,16 @@
         feather.replace();
         
         // Initialize application
-        if (typeof FullStockApp !== 'undefined') {
-            const app = new FullStockApp();
-            app.init();
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded');
+            if (typeof FullStockApp !== 'undefined') {
+                const app = new FullStockApp();
+                app.init();
+                console.log('FullStockApp initialized');
+            } else {
+                console.error('FullStockApp not defined');
+            }
+        });
     </script>
 </body>
 </html>
