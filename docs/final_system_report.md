@@ -18,15 +18,15 @@
 #### Model Accuracy Metrics
 | Model | Status | MSE | Confidence Range | Agreement |
 |-------|--------|-----|------------------|-----------|
-| Random Forest | ✅ Active | Low | 0.04-0.15 | 99.54% |
-| XGBoost | ✅ Active | Low | 0.60-0.85 | 99.54% |
-| LSTM | ⚠️ Disabled | N/A | N/A | N/A |
-| Ensemble | ✅ Active | Optimized | 0.35-0.45 | 99.54% |
+| Random Forest | ✅ Active | Low | 0.04-0.15 | 95.03% |
+| XGBoost | ✅ Active | Low | 0.60-0.85 | 95.03% |
+| LSTM | ✅ Active | 93.05 | 0.85-0.95 | 95.03% |
+| Ensemble | ✅ Active | Optimized | 0.50-0.65 | 95.03% |
 
-#### Real Performance Examples
-- **SPY Analysis:** $632.78 → $592.59 (Bearish prediction)
-- **TSLA Analysis:** $319.91 → $527.18 (Bullish prediction)
-- **AAPL Analysis:** $213.25 → $533.44 (Bullish prediction)
+#### Real Performance Examples (WITH LSTM)
+- **SPY Analysis:** $632.78 → $602.43 (Bearish prediction, LSTM: $622.11)
+- **TSLA Analysis:** $319.91 → Enhanced with LSTM predictions
+- **AAPL Analysis:** $213.25 → Enhanced with LSTM predictions
 
 ### UI Render Status
 

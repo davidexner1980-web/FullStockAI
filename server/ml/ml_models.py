@@ -21,12 +21,16 @@ def _load_tensorflow():
     """Safely load TensorFlow with comprehensive error handling"""
     global TENSORFLOW_AVAILABLE, tf, keras, layers
     try:
+        # Suppress TensorFlow warnings
+        import os
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+        
         import tensorflow as tf_module
         tf = tf_module
         keras = tf_module.keras
         layers = tf_module.keras.layers
         TENSORFLOW_AVAILABLE = True
-        logging.info("TensorFlow loaded successfully for ML models")
+        logging.info(f"TensorFlow {tf_module.__version__} loaded successfully for LSTM models")
         return True
     except ImportError as e:
         logging.warning(f"TensorFlow not available: {str(e)}")
@@ -264,9 +268,13 @@ class MLModelManager:
             return False
     
     def train_lstm(self, data, sequence_length=60):
-        """Train LSTM model - disabled due to TensorFlow compatibility"""
-        logging.warning("LSTM training disabled: TensorFlow compatibility issue")
-        return False
+        """Train LSTM model"""
+        # Load TensorFlow if not already loaded
+        if not TENSORFLOW_AVAILABLE:
+            success = _load_tensorflow()
+            if not success:
+                logging.warning("Cannot train LSTM: TensorFlow not available")
+                return False
             
         try:
             # Prepare data for LSTM
@@ -410,9 +418,58 @@ class MLModelManager:
     
     def predict_lstm(self, data, sequence_length=60):
         """Make prediction using LSTM"""
-        # LSTM is disabled due to TensorFlow compatibility issues
-        logging.warning("LSTM prediction disabled: TensorFlow compatibility issue")
-        return {'error': 'LSTM prediction unavailable - TensorFlow compatibility issue'}
+        try:
+            # Load TensorFlow if not already loaded
+            if not TENSORFLOW_AVAILABLE:
+                success = _load_tensorflow()
+                if not success:
+                    return {'error': 'LSTM prediction unavailable - TensorFlow compatibility issue'}
+            
+            if self.models['lstm'] is None:
+                # Try to load saved model
+                if os.path.exists('models/lstm.h5'):
+                    self.models['lstm'] = keras.models.load_model('models/lstm.h5')
+                    self.scalers['target'] = joblib.load('models/target_scaler.joblib')
+                else:
+                    # Train model if not available
+                    success = self.train_lstm(data)
+                    if not success:
+                        return {'error': 'Failed to train LSTM model'}
+            
+            # Prepare data
+            close_prices = data['Close'].values.reshape(-1, 1)
+            
+            # Ensure scaler is fitted
+            if 'target' not in self.scalers or self.scalers['target'] is None:
+                self.scalers['target'] = MinMaxScaler()
+                self.scalers['target'].fit(close_prices)
+            
+            scaled_data = self.scalers['target'].transform(close_prices)
+            
+            # Get last sequence for prediction
+            if len(scaled_data) < sequence_length:
+                sequence_length = min(len(scaled_data), 30)  # Use shorter sequence if needed
+            
+            last_sequence = scaled_data[-sequence_length:].reshape(1, sequence_length, 1)
+            
+            # Make prediction
+            prediction_scaled = self.models['lstm'].predict(last_sequence, verbose=0)
+            prediction = self.scalers['target'].inverse_transform(prediction_scaled)[0][0]
+            
+            # Calculate confidence based on recent volatility
+            recent_prices = data['Close'].tail(10).values
+            volatility = np.std(recent_prices) / np.mean(recent_prices)
+            confidence = max(0.1, 0.9 - volatility)  # Higher volatility = lower confidence
+            
+            return {
+                'prediction': float(prediction),
+                'confidence': float(confidence),
+                'model': 'LSTM Neural Network'
+            }
+            
+        except Exception as e:
+            logging.error(f"Error in LSTM prediction: {str(e)}")
+            return {'error': f'LSTM prediction failed: {str(e)}'}
         
         try:
             if self.models['lstm'] is None:
