@@ -93,41 +93,15 @@ async function analyzeStock(ticker) {
     // Update UI state
     showLoadingState();
     
-    // Set up a safety timeout to ensure loading state gets cleared
-    const timeoutId = setTimeout(() => {
-        console.warn('Analysis timeout reached, forcing cleanup');
-        hideLoadingState();
-        isAnalyzing = false;
-        showError(`Analysis timeout for ${ticker} - please try again`);
-        updateLiveUpdates(`⏰ Analysis timeout for ${ticker}`);
-    }, 30000); // 30 second timeout
-    
     try {
-        // Fetch predictions from backend with timeout
-        const controller = new AbortController();
-        const timeoutSignal = setTimeout(() => controller.abort(), 25000); // 25s fetch timeout
-        
-        const response = await fetch(`/api/predict/${ticker}`, {
-            signal: controller.signal,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        clearTimeout(timeoutSignal);
+        // Fetch predictions from backend
+        const response = await fetch(`/api/predict/${ticker}`);
         
         if (!response.ok) {
-            throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+            throw new Error(`API Error: ${response.status}`);
         }
         
         const data = await response.json();
-        
-        // Validate response data
-        if (!data || !data.current_price) {
-            throw new Error('Invalid response data from API');
-        }
-        
         console.log('Analysis successful, updating UI...', data);
         
         // Update UI with real data
@@ -135,35 +109,15 @@ async function analyzeStock(ticker) {
         updateLiveUpdates(`📊 Analysis complete for ${ticker}`);
         
         // Load chart data
-        try {
-            await loadChartData(ticker);
-        } catch (chartError) {
-            console.warn('Chart loading failed:', chartError);
-            updateLiveUpdates(`⚠️ Chart data unavailable for ${ticker}`);
-        }
+        await loadChartData(ticker);
         
         // Show sections
         showResultSections();
         
-        // Clear the timeout since we succeeded
-        clearTimeout(timeoutId);
-        
     } catch (error) {
-        clearTimeout(timeoutId);
-        
         console.error('Analysis error:', error);
-        
-        let errorMessage = error.message;
-        if (error.name === 'AbortError') {
-            errorMessage = 'Request timed out - please try again';
-        }
-        
-        showError(`Failed to analyze ${ticker}: ${errorMessage}`);
-        updateLiveUpdates(`❌ Error analyzing ${ticker}: ${errorMessage}`);
-        
-        // Show a user-friendly error state
-        showErrorState(ticker, errorMessage);
-        
+        showError(`Failed to analyze ${ticker}: ${error.message}`);
+        updateLiveUpdates(`❌ Error analyzing ${ticker}: ${error.message}`);
     } finally {
         hideLoadingState();
         isAnalyzing = false;
@@ -289,131 +243,43 @@ function showLoadingState() {
     analyzeText.textContent = 'Analyzing...';
     loadingOverlay.style.display = 'flex';
     
-    // Clear any existing interval first
-    if (window.loadingInterval) {
-        clearInterval(window.loadingInterval);
-    }
-    
     // Update loading text periodically
     const messages = [
         'Fetching real-time prices...',
         'Running ML predictions...',
         'Analyzing market trends...',
-        'Processing ensemble results...',
-        'Finalizing analysis...'
+        'Processing ensemble results...'
     ];
     let msgIndex = 0;
-    
-    // Set initial message
-    const loadingTextElement = document.getElementById('loadingText');
-    if (loadingTextElement) {
-        loadingTextElement.textContent = messages[0];
-    }
-    
-    // Create new interval
     const loadingInterval = setInterval(() => {
-        if (loadingTextElement) {
-            msgIndex = (msgIndex + 1) % messages.length;
-            loadingTextElement.textContent = messages[msgIndex];
-        }
-    }, 2000);
+        document.getElementById('loadingText').textContent = messages[msgIndex];
+        msgIndex = (msgIndex + 1) % messages.length;
+    }, 1500);
     
     // Store interval for cleanup
     window.loadingInterval = loadingInterval;
 }
 
 function hideLoadingState() {
-    console.log('Hiding loading state');
-    
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
     const loadingOverlay = document.getElementById('loadingOverlay');
     
-    if (analyzeBtn) {
-        analyzeBtn.disabled = false;
-    }
-    if (analyzeText) {
-        analyzeText.textContent = 'Analyze';
-    }
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'none';
-    }
+    analyzeBtn.disabled = false;
+    analyzeText.textContent = 'Analyze';
+    loadingOverlay.style.display = 'none';
     
-    // Always clear the loading interval
     if (window.loadingInterval) {
         clearInterval(window.loadingInterval);
-        window.loadingInterval = null;
     }
-    
-    console.log('Loading state hidden');
 }
 
 /**
  * Show Error Message
  */
 function showError(message) {
+    // You could implement a toast notification system here
     console.error(message);
-    
-    // Show error in live updates
-    updateLiveUpdates(`🔴 ${message}`);
-    
-    // Create a simple toast notification
-    const toast = document.createElement('div');
-    toast.className = 'position-fixed top-0 end-0 p-3';
-    toast.style.zIndex = '9999';
-    toast.innerHTML = `
-        <div class="toast show" role="alert">
-            <div class="toast-header bg-danger text-white">
-                <strong class="me-auto">Error</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body">
-                ${message}
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-        }
-    }, 5000);
-}
-
-/**
- * Show Error State in UI
- */
-function showErrorState(ticker, message) {
-    // Update price section with error
-    const priceElement = document.getElementById('currentPrice');
-    if (priceElement) {
-        priceElement.textContent = 'Error';
-        priceElement.className = 'display-4 fw-bold text-danger';
-    }
-    
-    const timestampElement = document.getElementById('priceTimestamp');
-    if (timestampElement) {
-        timestampElement.textContent = `Failed to analyze ${ticker}: ${message}`;
-    }
-    
-    // Show error message in results section
-    document.getElementById('priceSection').style.display = 'block';
-    
-    // Reset prediction cards to error state
-    const predictionCards = ['randomForestCard', 'lstmCard', 'xgboostCard'];
-    predictionCards.forEach(cardId => {
-        const card = document.getElementById(cardId);
-        if (card) {
-            card.classList.remove('active');
-            const predictionElement = card.querySelector('[id$="Prediction"]');
-            if (predictionElement) {
-                predictionElement.textContent = 'Error';
-            }
-        }
-    });
 }
 
 /**
@@ -477,41 +343,6 @@ function setupMobileHandlers() {
         });
     }
 }
-
-// Safety mechanism: Global click handler to clear stuck loading states
-document.addEventListener('click', (e) => {
-    // If clicking on the loading overlay itself, force clear it after 2 seconds
-    if (e.target.closest('#loadingOverlay') && window.loadingInterval) {
-        setTimeout(() => {
-            if (document.getElementById('loadingOverlay').style.display !== 'none') {
-                console.warn('Force clearing stuck loading state via click');
-                hideLoadingState();
-                isAnalyzing = false;
-                updateLiveUpdates('⚠️ Loading state cleared manually');
-            }
-        }, 2000);
-    }
-});
-
-// Safety backup: Clear any loading state that's been active too long
-setInterval(() => {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay && loadingOverlay.style.display === 'flex') {
-        // If loading has been showing for more than 45 seconds, force clear
-        if (!window.loadingStartTime) {
-            window.loadingStartTime = Date.now();
-        } else if (Date.now() - window.loadingStartTime > 45000) {
-            console.warn('Force clearing loading state - timeout exceeded');
-            hideLoadingState();
-            isAnalyzing = false;
-            updateLiveUpdates('🕐 Analysis timeout - please try again');
-            delete window.loadingStartTime;
-        }
-    } else {
-        // Clear timestamp when not loading
-        delete window.loadingStartTime;
-    }
-}, 5000); // Check every 5 seconds
 
 // Initialize mobile handlers after DOM load
 document.addEventListener('DOMContentLoaded', setupMobileHandlers);

@@ -13,19 +13,19 @@ let reconnectInterval = null;
  */
 function initializeWebSocket() {
     try {
-        // Connect to Socket.IO server with more conservative settings
+        // Connect to Socket.IO server with optimized transport settings
         socket = io({
-            transports: ['polling', 'websocket'], // Try polling first, then websocket
+            transports: ['websocket', 'polling'],
             upgrade: true,
             forceNew: false,
-            timeout: 15000,
+            timeout: 10000,
             reconnection: true,
-            reconnectionDelay: 2000,
-            reconnectionDelayMax: 10000,
-            reconnectionAttempts: 5,
-            maxReconnectionAttempts: 5,
-            pingTimeout: 30000,
-            pingInterval: 15000
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            reconnectionAttempts: 10,
+            maxReconnectionAttempts: 10,
+            pingTimeout: 60000,
+            pingInterval: 25000
         });
         
         setupSocketEventListeners();
@@ -88,14 +88,16 @@ function setupSocketEventListeners() {
         
         if (connectionRetryCount <= maxRetryAttempts) {
             updateConnectionStatus('warning', `Retry ${connectionRetryCount}/${maxRetryAttempts}`);
-            // Don't retry too aggressively - let Socket.IO handle it
+            setTimeout(() => {
+                if (socket.disconnected) {
+                    socket.connect();
+                }
+            }, 3000 * connectionRetryCount);
         } else {
             updateConnectionStatus('error', 'Offline');
             if (typeof updateLiveUpdates === 'function') {
-                updateLiveUpdates('🔴 WebSocket failed, using HTTP mode');
+                updateLiveUpdates('🔴 Connection failed after multiple attempts');
             }
-            // Fall back to HTTP polling
-            fallbackToHttpMode();
         }
     });
     
@@ -355,20 +357,13 @@ function fallbackToHttpMode() {
     updateConnectionStatus('warning', 'HTTP Only');
     
     // Disable socket-based features
-    if (socket) {
-        socket.disconnect();
-        socket = null;
-    }
+    socket = null;
     
-    // Clear any retry intervals
-    if (reconnectInterval) {
-        clearInterval(reconnectInterval);
-        reconnectInterval = null;
-    }
-    
-    // Don't start polling immediately - let user-initiated requests handle updates
-    if (typeof updateLiveUpdates === 'function') {
-        updateLiveUpdates('📡 Using HTTP mode for data updates');
+    // Set up periodic HTTP polling for live updates
+    if (window.currentTicker) {
+        setInterval(() => {
+            fetchPredictionUpdate(window.currentTicker);
+        }, 30000); // Poll every 30 seconds
     }
 }
 
