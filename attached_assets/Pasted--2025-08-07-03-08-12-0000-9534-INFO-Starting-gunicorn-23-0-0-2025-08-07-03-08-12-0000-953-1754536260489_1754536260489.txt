@@ -1,0 +1,358 @@
+[2025-08-07 03:08:12 +0000] [9534] [INFO] Starting gunicorn 23.0.0
+[2025-08-07 03:08:12 +0000] [9534] [INFO] Listening at: http://0.0.0.0:5000 (9534)
+[2025-08-07 03:08:12 +0000] [9534] [INFO] Using worker: sync
+[2025-08-07 03:08:12 +0000] [9545] [INFO] Booting worker with pid: 9545
+[2025-08-07 03:08:12 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:12 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:13 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:13 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:13 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:13 +0000] [9534] [INFO] Handling signal: winch
+DEBUG:tzlocal:No explicit setting existed. Use localtime
+INFO:apscheduler.scheduler:Scheduler started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+[2025-08-07 03:08:13 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:13 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:13 +0000] [9534] [INFO] Handling signal: winch
+INFO:apscheduler.scheduler:Added job "check_price_alerts" to job store "default"
+INFO:apscheduler.scheduler:Added job "run_health_check" to job store "default"
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:08:45.194419+00:00 (in 29.998961 seconds)
+[2025-08-07 03:08:15 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:15 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:15 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:15 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:15 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:15 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:15 +0000] [9534] [INFO] Handling signal: winch
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+INFO:apscheduler.executors.default:Running job "check_price_alerts (trigger: interval[0:00:30], next run at: 2025-08-07 03:08:45 UTC)" (scheduled at 2025-08-07 03:08:45.194419+00:00)
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:09:15.194419+00:00 (in 29.996248 seconds)
+INFO:apscheduler.executors.default:Job "check_price_alerts (trigger: interval[0:00:30], next run at: 2025-08-07 03:09:15 UTC)" executed successfully
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [CRITICAL] WORKER TIMEOUT (pid:9545)
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [ERROR] Worker (pid:9545) was sent SIGKILL! Perhaps out of memory?
+[2025-08-07 03:08:45 +0000] [9629] [INFO] Booting worker with pid: 9629
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:45 +0000] [9534] [INFO] Handling signal: winch
+[2025-08-07 03:08:46 +0000] [9534] [INFO] Handling signal: winch
+DEBUG:tzlocal:No explicit setting existed. Use localtime
+INFO:apscheduler.scheduler:Scheduler started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+INFO:apscheduler.scheduler:Added job "check_price_alerts" to job store "default"
+INFO:apscheduler.scheduler:Added job "run_health_check" to job store "default"
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:09:18.638710+00:00 (in 29.999220 seconds)
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:09:18.638710+00:00 (in 29.999093 seconds)
+DEBUG:yfinance:Entering history()
+DEBUG:peewee:('CREATE TABLE IF NOT EXISTS "_tz_kv" ("key" VARCHAR(255) NOT NULL PRIMARY KEY, "value" VARCHAR(255)) WITHOUT ROWID', [])
+DEBUG:peewee:('SELECT "t1"."key", "t1"."value" FROM "_tz_kv" AS "t1" WHERE ("t1"."key" = ?) LIMIT ? OFFSET ?', ['SPY', 1, 0])
+DEBUG:yfinance: Entering history()
+DEBUG:yfinance:SPY: Yahoo GET parameters: {'range': '1y', 'interval': '1d', 'includePrePost': False, 'events': 'div,splits,capitalGains'}
+DEBUG:yfinance:  Entering get()
+DEBUG:yfinance:   Entering _make_request()
+DEBUG:yfinance:url=https://query2.finance.yahoo.com/v8/finance/chart/SPY
+DEBUG:yfinance:params={'range': '1y', 'interval': '1d', 'includePrePost': False, 'events': 'div,splits,capitalGains'}
+DEBUG:yfinance:    Entering _get_cookie_and_crumb()
+DEBUG:yfinance:cookie_mode = 'basic'
+DEBUG:yfinance:     Entering _get_cookie_and_crumb_basic()
+DEBUG:yfinance:      Entering _get_cookie_basic()
+DEBUG:yfinance:       Entering _load_cookie_curlCffi()
+DEBUG:peewee:('CREATE TABLE IF NOT EXISTS "_cookieschema" ("strategy" VARCHAR(255) NOT NULL PRIMARY KEY, "fetch_date" DATETIME NOT NULL, "cookie_bytes" BLOB NOT NULL) WITHOUT ROWID', [])
+DEBUG:peewee:('SELECT "t1"."strategy", "t1"."fetch_date", "t1"."cookie_bytes" FROM "_cookieschema" AS "t1" WHERE ("t1"."strategy" = ?) LIMIT ? OFFSET ?', ['curlCffi', 1, 0])
+DEBUG:yfinance:       Exiting _load_cookie_curlCffi()
+DEBUG:yfinance:reusing persistent cookie
+DEBUG:yfinance:      Exiting _get_cookie_basic()
+DEBUG:yfinance:      Entering _get_crumb_basic()
+DEBUG:yfinance:       Entering _get_cookie_basic()
+DEBUG:yfinance:reusing cookie
+DEBUG:yfinance:       Exiting _get_cookie_basic()
+DEBUG:yfinance:crumb = 'aw8As6/fP1I'
+DEBUG:yfinance:      Exiting _get_crumb_basic()
+DEBUG:yfinance:     Exiting _get_cookie_and_crumb_basic()
+DEBUG:yfinance:    Exiting _get_cookie_and_crumb()
+DEBUG:yfinance:response code=200
+DEBUG:yfinance:   Exiting _make_request()
+DEBUG:yfinance:  Exiting get()
+DEBUG:yfinance:SPY: yfinance received OHLC data: 2024-08-07 13:30:00 -> 2025-08-06 13:30:00
+DEBUG:yfinance:SPY: OHLC after cleaning: 2024-08-07 09:30:00-04:00 -> 2025-08-06 09:30:00-04:00
+DEBUG:yfinance:SPY: OHLC after combining events: 2024-08-07 00:00:00-04:00 -> 2025-08-06 00:00:00-04:00
+DEBUG:yfinance:SPY: yfinance returning OHLC: 2024-08-07 00:00:00-04:00 -> 2025-08-06 00:00:00-04:00
+DEBUG:yfinance: Exiting history()
+DEBUG:yfinance:Exiting history()
+INFO:root:Prepared 249 samples with 18 features
+2025-08-07 03:08:49.543177: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2025-08-07 03:08:49.543212: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-08-07 03:08:49.544430: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+DEBUG:tensorflow:Falling back to TensorFlow client; we recommended you install the Cloud TPU client directly with pip install cloud-tpu-client.
+DEBUG:h5py._conv:Creating converter from 7 to 5
+DEBUG:h5py._conv:Creating converter from 5 to 7
+DEBUG:h5py._conv:Creating converter from 7 to 5
+DEBUG:h5py._conv:Creating converter from 5 to 7
+INFO:root:TensorFlow 2.15.0 loaded successfully for LSTM models
+DEBUG:h5py._conv:Creating converter from 3 to 5
+INFO:root:Prepared 249 samples with 18 features
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+INFO:apscheduler.executors.default:Running job "check_price_alerts (trigger: interval[0:00:30], next run at: 2025-08-07 03:09:18 UTC)" (scheduled at 2025-08-07 03:09:18.638710+00:00)
+INFO:apscheduler.executors.default:Job "check_price_alerts (trigger: interval[0:00:30], next run at: 2025-08-07 03:09:18 UTC)" executed successfully
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:09:48.638710+00:00 (in 29.994961 seconds)
+[2025-08-07 03:09:25 +0000] [9534] [CRITICAL] WORKER TIMEOUT (pid:9629)
+[2025-08-07 03:09:25 +0000] [9629] [ERROR] Error handling request /socket.io/?EIO=4&transport=websocket
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask_socketio/__init__.py", line 42, in __call__
+    return super().__call__(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/middleware.py", line 63, in __call__
+    return self.engineio_app.handle_request(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/socketio/server.py", line 434, in handle_request
+    return self.eio.handle_request(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/server.py", line 261, in handle_request
+    r = self._handle_connect(environ, start_response,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/server.py", line 416, in _handle_connect
+    ret = s.handle_get_request(environ, start_response)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 92, in handle_get_request
+    return getattr(self, '_upgrade_' + transport)(environ,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 151, in _upgrade_websocket
+    return ws(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/async_drivers/_websocket_wsgi.py", line 15, in __call__
+    ret = self.app(self)
+          ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 225, in _websocket_handler
+    p = websocket_wait()
+        ^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 156, in websocket_wait
+    data = ws.wait()
+           ^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/async_drivers/_websocket_wsgi.py", line 32, in wait
+    return self.ws.receive()
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/simple_websocket/ws.py", line 96, in receive
+    if not self.event.wait(timeout=timeout):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py", line 629, in wait
+    signaled = self._cond.wait(timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py", line 327, in wait
+    waiter.acquire()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-08-07 03:09:25 +0000] [9629] [INFO] Worker exiting (pid: 9629)
+INFO:apscheduler.scheduler:Scheduler has been shut down
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+[2025-08-07 03:09:26 +0000] [9715] [INFO] Booting worker with pid: 9715
+DEBUG:tzlocal:No explicit setting existed. Use localtime
+INFO:apscheduler.scheduler:Scheduler started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+INFO:apscheduler.scheduler:Added job "check_price_alerts" to job store "default"
+INFO:apscheduler.scheduler:Added job "run_health_check" to job store "default"
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:09:58.410711+00:00 (in 29.999389 seconds)
+DEBUG:yfinance:Entering history()
+DEBUG:peewee:('CREATE TABLE IF NOT EXISTS "_tz_kv" ("key" VARCHAR(255) NOT NULL PRIMARY KEY, "value" VARCHAR(255)) WITHOUT ROWID', [])
+DEBUG:peewee:('SELECT "t1"."key", "t1"."value" FROM "_tz_kv" AS "t1" WHERE ("t1"."key" = ?) LIMIT ? OFFSET ?', ['SPY', 1, 0])
+DEBUG:yfinance: Entering history()
+DEBUG:yfinance:SPY: Yahoo GET parameters: {'range': '3mo', 'interval': '1d', 'includePrePost': False, 'events': 'div,splits,capitalGains'}
+DEBUG:yfinance:  Entering get()
+DEBUG:yfinance:   Entering _make_request()
+DEBUG:yfinance:url=https://query2.finance.yahoo.com/v8/finance/chart/SPY
+DEBUG:yfinance:params={'range': '3mo', 'interval': '1d', 'includePrePost': False, 'events': 'div,splits,capitalGains'}
+DEBUG:yfinance:    Entering _get_cookie_and_crumb()
+DEBUG:yfinance:cookie_mode = 'basic'
+DEBUG:yfinance:     Entering _get_cookie_and_crumb_basic()
+DEBUG:yfinance:      Entering _get_cookie_basic()
+DEBUG:yfinance:       Entering _load_cookie_curlCffi()
+DEBUG:peewee:('CREATE TABLE IF NOT EXISTS "_cookieschema" ("strategy" VARCHAR(255) NOT NULL PRIMARY KEY, "fetch_date" DATETIME NOT NULL, "cookie_bytes" BLOB NOT NULL) WITHOUT ROWID', [])
+DEBUG:peewee:('SELECT "t1"."strategy", "t1"."fetch_date", "t1"."cookie_bytes" FROM "_cookieschema" AS "t1" WHERE ("t1"."strategy" = ?) LIMIT ? OFFSET ?', ['curlCffi', 1, 0])
+DEBUG:yfinance:       Exiting _load_cookie_curlCffi()
+DEBUG:yfinance:reusing persistent cookie
+DEBUG:yfinance:      Exiting _get_cookie_basic()
+DEBUG:yfinance:      Entering _get_crumb_basic()
+DEBUG:yfinance:       Entering _get_cookie_basic()
+DEBUG:yfinance:reusing cookie
+DEBUG:yfinance:       Exiting _get_cookie_basic()
+DEBUG:yfinance:crumb = 'aw8As6/fP1I'
+DEBUG:yfinance:      Exiting _get_crumb_basic()
+DEBUG:yfinance:     Exiting _get_cookie_and_crumb_basic()
+DEBUG:yfinance:    Exiting _get_cookie_and_crumb()
+DEBUG:yfinance:response code=200
+DEBUG:yfinance:   Exiting _make_request()
+DEBUG:yfinance:  Exiting get()
+DEBUG:yfinance:SPY: yfinance received OHLC data: 2025-05-07 13:30:00 -> 2025-08-06 13:30:00
+DEBUG:yfinance:SPY: OHLC after cleaning: 2025-05-07 09:30:00-04:00 -> 2025-08-06 09:30:00-04:00
+DEBUG:yfinance:SPY: OHLC after combining events: 2025-05-07 00:00:00-04:00 -> 2025-08-06 00:00:00-04:00
+DEBUG:yfinance:SPY: yfinance returning OHLC: 2025-05-07 00:00:00-04:00 -> 2025-08-06 00:00:00-04:00
+DEBUG:yfinance: Exiting history()
+DEBUG:yfinance:Exiting history()
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+INFO:apscheduler.executors.default:Running job "check_price_alerts (trigger: interval[0:00:30], next run at: 2025-08-07 03:09:58 UTC)" (scheduled at 2025-08-07 03:09:58.410711+00:00)
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:10:28.410711+00:00 (in 29.998936 seconds)
+INFO:apscheduler.executors.default:Job "check_price_alerts (trigger: interval[0:00:30], next run at: 2025-08-07 03:10:28 UTC)" executed successfully
+[2025-08-07 03:09:59 +0000] [9534] [CRITICAL] WORKER TIMEOUT (pid:9715)
+[2025-08-07 03:09:59 +0000] [9715] [ERROR] Error handling request /socket.io/?EIO=4&transport=websocket
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask_socketio/__init__.py", line 42, in __call__
+    return super().__call__(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/middleware.py", line 63, in __call__
+    return self.engineio_app.handle_request(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/socketio/server.py", line 434, in handle_request
+    return self.eio.handle_request(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/server.py", line 261, in handle_request
+    r = self._handle_connect(environ, start_response,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/server.py", line 416, in _handle_connect
+    ret = s.handle_get_request(environ, start_response)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 92, in handle_get_request
+    return getattr(self, '_upgrade_' + transport)(environ,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 151, in _upgrade_websocket
+    return ws(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/async_drivers/_websocket_wsgi.py", line 15, in __call__
+    ret = self.app(self)
+          ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 225, in _websocket_handler
+    p = websocket_wait()
+        ^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 156, in websocket_wait
+    data = ws.wait()
+           ^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/async_drivers/_websocket_wsgi.py", line 32, in wait
+    return self.ws.receive()
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/simple_websocket/ws.py", line 96, in receive
+    if not self.event.wait(timeout=timeout):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py", line 629, in wait
+    signaled = self._cond.wait(timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py", line 327, in wait
+    waiter.acquire()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-08-07 03:09:59 +0000] [9715] [INFO] Worker exiting (pid: 9715)
+INFO:apscheduler.scheduler:Scheduler has been shut down
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+[2025-08-07 03:09:59 +0000] [9748] [INFO] Booting worker with pid: 9748
+DEBUG:tzlocal:No explicit setting existed. Use localtime
+INFO:apscheduler.scheduler:Scheduler started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+INFO:apscheduler.scheduler:Added job "check_price_alerts" to job store "default"
+INFO:apscheduler.scheduler:Added job "run_health_check" to job store "default"
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:10:31.890586+00:00 (in 29.999341 seconds)
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+INFO:apscheduler.executors.default:Running job "check_price_alerts (trigger: interval[0:00:30], next run at: 2025-08-07 03:10:31 UTC)" (scheduled at 2025-08-07 03:10:31.890586+00:00)
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:11:01.890586+00:00 (in 29.999213 seconds)
+INFO:apscheduler.executors.default:Job "check_price_alerts (trigger: interval[0:00:30], next run at: 2025-08-07 03:11:01 UTC)" executed successfully
+[2025-08-07 03:10:32 +0000] [9534] [CRITICAL] WORKER TIMEOUT (pid:9748)
+[2025-08-07 03:10:32 +0000] [9748] [ERROR] Error handling request /socket.io/?EIO=4&transport=websocket
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask_socketio/__init__.py", line 42, in __call__
+    return super().__call__(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/middleware.py", line 63, in __call__
+    return self.engineio_app.handle_request(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/socketio/server.py", line 434, in handle_request
+    return self.eio.handle_request(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/server.py", line 261, in handle_request
+    r = self._handle_connect(environ, start_response,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/server.py", line 416, in _handle_connect
+    ret = s.handle_get_request(environ, start_response)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 92, in handle_get_request
+    return getattr(self, '_upgrade_' + transport)(environ,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 151, in _upgrade_websocket
+    return ws(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/async_drivers/_websocket_wsgi.py", line 15, in __call__
+    ret = self.app(self)
+          ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 225, in _websocket_handler
+    p = websocket_wait()
+        ^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/socket.py", line 156, in websocket_wait
+    data = ws.wait()
+           ^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/engineio/async_drivers/_websocket_wsgi.py", line 32, in wait
+    return self.ws.receive()
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/simple_websocket/ws.py", line 96, in receive
+    if not self.event.wait(timeout=timeout):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py", line 629, in wait
+    signaled = self._cond.wait(timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py", line 327, in wait
+    waiter.acquire()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-08-07 03:10:32 +0000] [9748] [INFO] Worker exiting (pid: 9748)
+INFO:apscheduler.scheduler:Scheduler has been shut down
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+[2025-08-07 03:10:33 +0000] [9773] [INFO] Booting worker with pid: 9773
+DEBUG:tzlocal:No explicit setting existed. Use localtime
+INFO:apscheduler.scheduler:Scheduler started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+INFO:apscheduler.scheduler:Added job "check_price_alerts" to job store "default"
+INFO:apscheduler.scheduler:Added job "run_health_check" to job store "default"
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-08-07 03:11:05.415519+00:00 (in 29.996500 seconds)
