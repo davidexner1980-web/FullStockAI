@@ -91,3 +91,6 @@ scheduler.add_job(
     minutes=60,
     id='health_check'
 )
+
+# Import routes to register them with Flask
+import routes

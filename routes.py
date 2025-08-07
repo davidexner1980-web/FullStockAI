@@ -43,6 +43,18 @@ portfolio_optimizer = PortfolioOptimizer()
 def index():
     return render_template('index.html')
 
+@app.route('/crypto.html')
+def crypto():
+    return render_template('crypto.html')
+
+@app.route('/oracle.html')
+def oracle():
+    return render_template('oracle.html')
+
+@app.route('/portfolio.html')
+def portfolio():
+    return render_template('portfolio.html')
+
 @app.route('/api/predict/<ticker>')
 @cache.cached(timeout=300)
 def predict(ticker):

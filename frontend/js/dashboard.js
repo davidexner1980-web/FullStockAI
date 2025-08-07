@@ -4,7 +4,6 @@
  */
 
 let currentTicker = 'SPY';
-let priceChart = null;
 let isAnalyzing = false;
 
 /**
@@ -17,10 +16,14 @@ function initializeDashboard() {
     setupEventListeners();
     
     // Initialize WebSocket connection
-    initializeWebSocket();
+    if (typeof initializeWebSocket === 'function') {
+        initializeWebSocket();
+    }
     
     // Setup chart
-    initializeChart();
+    if (typeof initializeChart === 'function') {
+        initializeChart();
+    }
     
     console.log('Dashboard initialized successfully');
 }
