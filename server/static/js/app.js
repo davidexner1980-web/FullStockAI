@@ -79,8 +79,13 @@ class FullStockApp {
                 throw new Error(prediction.error);
             }
 
+            console.log('Analysis successful, updating UI...');
+            
             // Update UI with prediction data
             this.updatePredictionDisplay(prediction);
+            
+            // Show results immediately after updating prediction display
+            this.showResults();
             
             // Fetch and display chart
             await this.updateChart(ticker);
@@ -90,7 +95,6 @@ class FullStockApp {
                 await this.fetchOracleInsights(ticker);
             }
 
-            this.showResults();
             this.updateURL(ticker);
 
         } catch (error) {
@@ -329,7 +333,14 @@ class FullStockApp {
     }
 
     showResults() {
-        document.getElementById('resultsSection').classList.remove('d-none');
+        console.log('Showing results section');
+        const resultsSection = document.getElementById('resultsSection');
+        if (resultsSection) {
+            resultsSection.classList.remove('d-none');
+            console.log('Results section is now visible');
+        } else {
+            console.error('Results section not found!');
+        }
     }
 
     hideResults() {
