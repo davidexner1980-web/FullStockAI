@@ -21,8 +21,10 @@ socketio = SocketIO()
 cache = Cache()
 mail = Mail()
 
-# Create the app
-app = Flask(__name__)
+# Create the app with correct template and static folders
+app = Flask(__name__, 
+           template_folder='server/templates',
+           static_folder='server/static')
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback-secret-key-for-development")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
