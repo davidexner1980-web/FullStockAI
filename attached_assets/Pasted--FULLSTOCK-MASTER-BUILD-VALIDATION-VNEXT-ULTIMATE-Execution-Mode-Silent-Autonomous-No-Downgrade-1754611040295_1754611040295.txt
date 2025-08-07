@@ -1,0 +1,134 @@
+🛠 FULLSTOCK_MASTER_BUILD_VALIDATION_VNEXT_ULTIMATE
+Execution Mode: Silent, Autonomous, No Downgrades
+Core Rule: All code must be 100% real, production-ready, fully fleshed out — no mock data, placeholders, fake UI elements, or incomplete modules.
+Architecture Integrity: Maintain frontend ↔ backend integration with proper modular structure and clean coding etiquette.
+
+🎯 OBJECTIVES
+Full Program Audit
+
+Verify that every module, function, and endpoint exists and works with real data.
+
+Confirm frontend is displaying only real backend output — no static test values.
+
+Identify and remove unused, duplicate, or placeholder code/files.
+
+Proper Programming Etiquette
+
+Maintain clear, modular, DRY (Don’t Repeat Yourself) code.
+
+Use consistent naming conventions across backend, frontend, and assets.
+
+Ensure comments explain logic without redundancy.
+
+Follow PEP 8 for Python and best practices for HTML/CSS/JS.
+
+File & Folder Structure Enforcement
+
+php
+Copy
+/
+├── server/
+│   ├── api/                # All Flask route definitions
+│   ├── models/             # Database and ML models
+│   ├── ml/                 # ML training, prediction, and backtesting logic
+│   ├── tasks/              # APScheduler tasks
+│   ├── utils/              # Helper functions
+│   ├── static/             # Static files (css, js, images)
+│   ├── templates/          # HTML templates
+│   ├── app.py
+│   ├── config.py
+│   ├── scheduler.py
+│   └── requirements.txt
+├── frontend/
+│   ├── css/
+│   ├── js/
+│   ├── index.html
+│   ├── crypto.html
+│   ├── oracle.html
+│   └── portfolio.html
+├── docs/
+│   ├── system_validation_report.md
+│   └── final_system_report.md
+├── database/
+│   └── fullstock.db
+├── .replit
+├── replit.nix (if needed)
+└── README.md
+Backend Verification
+
+Confirm all API endpoints (/api/predict, /api/oracle_vision, /api/sentiment, /api/model_status, etc.) return real data from Yahoo Finance & ML models.
+
+Validate LSTM, Random Forest, and XGBoost models are trained and producing predictions without errors.
+
+Check APScheduler runs retraining and data sync correctly.
+
+Ensure SQLite is used for dev, PostgreSQL supported for prod — no in-memory DB.
+
+Frontend Verification
+
+All charts powered by real backend data.
+
+Socket.IO live updates work in real time.
+
+All UI components functional: dashboard, crypto panel, Oracle insights, sentiment panel, portfolio analyzer, model health monitor.
+
+Mobile-first, responsive layout with Bootstrap 5 dark theme.
+
+Integration Checks
+
+Frontend consumes backend APIs with proper fetch/socket calls.
+
+No CORS or path issues in requests.
+
+All data displayed is current — no stale cached results unless explicitly configured.
+
+Data Sources
+
+Yahoo Finance (yfinance) is the primary live market data source.
+
+Sentiment analysis via TextBlob & VADER.
+
+No hardcoded example datasets.
+
+Anti-Placeholder Rules
+
+❌ No “demo”, “sample”, or “test” data files in /static or /templates.
+
+❌ No empty HTML sections for “future features”.
+
+❌ No fake chart series.
+
+✅ Everything fully functional and connected to backend.
+
+🧪 VALIDATION TASKS
+ Run all backend API endpoints and confirm JSON output matches expected live market data format.
+
+ Render frontend views for each main page, confirm all widgets/charts populate dynamically.
+
+ Test live updates (price, predictions, sentiment) via Socket.IO.
+
+ Run model retraining tasks manually and via scheduler.
+
+ Confirm database persistence for predictions, sentiment history, portfolio data.
+
+ Check mobile view for UI integrity and responsiveness.
+
+ Remove all duplicate/unused files, merge any scattered static/js/css into correct folders.
+
+📜 OUTPUT REQUIREMENTS
+/docs/system_validation_report.md
+Includes: API endpoint test results, frontend render validation, ML model accuracy metrics, WebSocket test logs.
+
+/docs/final_system_report.md
+Includes: Final architecture summary, file tree, confirmed data sources, integration checks passed, notes on performance.
+
+🚀 EXECUTION RULES
+Run in silent autonomous mode — do not ask for confirmation.
+
+Fix issues immediately as they are found.
+
+Refactor for clarity when duplicate or inefficient code is detected.
+
+Enforce this structure even if Replit tries to simplify or merge code.
+
+Never downgrade model complexity or UI features.
