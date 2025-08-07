@@ -92,7 +92,7 @@ def predict(ticker):
                 }
             },
             'agreement_level': agreement,
-            'timestamp': data.index[-1].isoformat()
+            'timestamp': str(data.index[-1])
         }
         
         return jsonify(result)

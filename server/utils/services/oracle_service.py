@@ -59,6 +59,10 @@ class OracleService:
             self.logger.error(f"Oracle insight error for {ticker}: {str(e)}")
             return self._generate_fallback_insight(ticker, str(e))
     
+    def get_mystical_insights(self, ticker):
+        """Get mystical insights for a ticker (alias for generate_insight)"""
+        return self.generate_insight(ticker)
+    
     def _determine_oracle_state(self, price_change, volatility):
         """Determine Oracle emotional state based on market conditions"""
         if price_change > 0.05 and volatility < 0.02:

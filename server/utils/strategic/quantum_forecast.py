@@ -66,6 +66,10 @@ class QuantumForecast:
             self.logger.error(f"Quantum forecast error for {ticker}: {str(e)}")
             return {'error': f'Quantum simulation failed: {str(e)}'}
     
+    def generate_quantum_paths(self, ticker):
+        """Generate quantum paths (alias for generate_quantum_forecast)"""
+        return self.generate_quantum_forecast(ticker)
+    
     def _generate_single_path(self, start_price, volatility, days):
         """Generate a single price path using geometric Brownian motion"""
         path = [start_price]

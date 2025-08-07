@@ -411,10 +411,16 @@ class MLModelManager:
     
     def predict_lstm(self, data, sequence_length=60):
         """Make prediction using LSTM"""
+        # Check if TensorFlow is available
+        if not TENSORFLOW_AVAILABLE:
+            if not _load_tensorflow():
+                logging.warning("LSTM prediction skipped: TensorFlow not available")
+                return {'error': 'LSTM prediction unavailable - TensorFlow not loaded'}
+        
         try:
             if self.models['lstm'] is None:
                 # Try to load saved model
-                if os.path.exists('models/lstm.h5'):
+                if os.path.exists('models/lstm.h5') and keras is not None:
                     self.models['lstm'] = keras.models.load_model('models/lstm.h5')
                     self.scalers['target'] = joblib.load('models/target_scaler.joblib')
                 else:

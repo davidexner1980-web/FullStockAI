@@ -21,6 +21,16 @@ class CryptoService:
             'AVAX': 'AVAX-USD'
         }
     
+    def get_supported_cryptos(self):
+        """Get list of supported cryptocurrencies"""
+        return {
+            'cryptos': [
+                {'symbol': k, 'name': f'{k} - {v}', 'ticker': v}
+                for k, v in self.crypto_tickers.items()
+            ],
+            'count': len(self.crypto_tickers)
+        }
+    
     def predict_crypto(self, crypto_symbol):
         """Generate cryptocurrency predictions"""
         try:
