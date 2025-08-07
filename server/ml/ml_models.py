@@ -411,11 +411,18 @@ class MLModelManager:
     
     def predict_lstm(self, data, sequence_length=60):
         """Make prediction using LSTM"""
-        # Check if TensorFlow is available
+        # Check if TensorFlow is available - fail gracefully if not
+        global TENSORFLOW_AVAILABLE
         if not TENSORFLOW_AVAILABLE:
-            if not _load_tensorflow():
-                logging.warning("LSTM prediction skipped: TensorFlow not available")
+            try:
+                _load_tensorflow()
+            except Exception as e:
+                logging.warning(f"LSTM prediction skipped: TensorFlow failed to load: {str(e)}")
                 return {'error': 'LSTM prediction unavailable - TensorFlow not loaded'}
+            
+        if not TENSORFLOW_AVAILABLE:
+            logging.warning("LSTM prediction skipped: TensorFlow not available")
+            return {'error': 'LSTM prediction unavailable - TensorFlow not loaded'}
         
         try:
             if self.models['lstm'] is None:

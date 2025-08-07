@@ -46,23 +46,37 @@ def predict(ticker):
             return jsonify({'error': 'Failed to fetch data for ticker'}), 400
         
         # Get predictions from all models (handle failures gracefully)
-        rf_prediction = ml_manager.predict_random_forest(data)
-        lstm_prediction = ml_manager.predict_lstm(data)
-        xgb_prediction = ml_manager.predict_xgboost(data)
+        try:
+            rf_prediction = ml_manager.predict_random_forest(data)
+        except Exception as e:
+            logging.error(f"Random Forest prediction failed: {str(e)}")
+            rf_prediction = {'error': f'Random Forest failed: {str(e)}'}
+        
+        try:
+            lstm_prediction = ml_manager.predict_lstm(data)
+        except Exception as e:
+            logging.warning(f"LSTM prediction failed: {str(e)}")
+            lstm_prediction = {'error': f'LSTM failed: {str(e)}'}
+        
+        try:
+            xgb_prediction = ml_manager.predict_xgboost(data)
+        except Exception as e:
+            logging.error(f"XGBoost prediction failed: {str(e)}")
+            xgb_prediction = {'error': f'XGBoost failed: {str(e)}'}
         
         # Filter successful predictions
         successful_predictions = []
         ensemble_confidence = 0
         
-        if 'prediction' in rf_prediction and 'error' not in rf_prediction:
+        if isinstance(rf_prediction, dict) and 'prediction' in rf_prediction and 'error' not in rf_prediction:
             successful_predictions.append(rf_prediction['prediction'])
             ensemble_confidence += rf_prediction.get('confidence', 0.5)
         
-        if 'prediction' in xgb_prediction and 'error' not in xgb_prediction:
+        if isinstance(xgb_prediction, dict) and 'prediction' in xgb_prediction and 'error' not in xgb_prediction:
             successful_predictions.append(xgb_prediction['prediction'])
             ensemble_confidence += xgb_prediction.get('confidence', 0.5)
         
-        if 'prediction' in lstm_prediction and 'error' not in lstm_prediction:
+        if isinstance(lstm_prediction, dict) and 'prediction' in lstm_prediction and 'error' not in lstm_prediction:
             successful_predictions.append(lstm_prediction['prediction'])
             ensemble_confidence += lstm_prediction.get('confidence', 0.5)
         

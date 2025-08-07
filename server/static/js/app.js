@@ -160,18 +160,21 @@ class FullStockApp {
         // Individual model predictions
         if (data.predictions) {
             // Random Forest
+            const rfPrediction = data.predictions.random_forest?.prediction || data.predictions.random_forest;
             document.getElementById('rfPrediction').textContent = 
-                data.predictions.random_forest ? `$${data.predictions.random_forest.toFixed(2)}` : '--';
+                rfPrediction ? `$${rfPrediction.toFixed(2)}` : '--';
             document.getElementById('rfConfidence').textContent = 
-                data.confidence?.random_forest ? `${(data.confidence.random_forest * 100).toFixed(1)}% confidence` : '--';
+                data.predictions.random_forest?.confidence ? `${(data.predictions.random_forest.confidence * 100).toFixed(1)}% confidence` : '--';
 
             // XGBoost
+            const xgbPrediction = data.predictions.xgboost?.prediction || data.predictions.xgboost;
             document.getElementById('xgbPrediction').textContent = 
-                data.predictions.xgboost ? `$${data.predictions.xgboost.toFixed(2)}` : '--';
+                xgbPrediction ? `$${xgbPrediction.toFixed(2)}` : '--';
             document.getElementById('xgbConfidence').textContent = 
-                data.confidence?.xgboost ? `${(data.confidence.xgboost * 100).toFixed(1)}% confidence` : '--';
+                data.predictions.xgboost?.confidence ? `${(data.predictions.xgboost.confidence * 100).toFixed(1)}% confidence` : '--';
 
             // LSTM
+            const lstmPrediction = data.predictions.lstm?.prediction || data.predictions.lstm;
             document.getElementById('lstmPrediction').textContent = 
                 data.predictions.lstm ? `$${data.predictions.lstm.toFixed(2)}` : '--';
             document.getElementById('lstmConfidence').textContent = 
