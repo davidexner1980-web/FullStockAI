@@ -264,10 +264,9 @@ class MLModelManager:
             return False
     
     def train_lstm(self, data, sequence_length=60):
-        """Train LSTM model - only if TensorFlow is available"""
-        if not TENSORFLOW_AVAILABLE:
-            logging.warning("LSTM training skipped: TensorFlow not available")
-            return False
+        """Train LSTM model - disabled due to TensorFlow compatibility"""
+        logging.warning("LSTM training disabled: TensorFlow compatibility issue")
+        return False
             
         try:
             # Prepare data for LSTM
@@ -411,18 +410,9 @@ class MLModelManager:
     
     def predict_lstm(self, data, sequence_length=60):
         """Make prediction using LSTM"""
-        # Check if TensorFlow is available - fail gracefully if not
-        global TENSORFLOW_AVAILABLE
-        if not TENSORFLOW_AVAILABLE:
-            try:
-                _load_tensorflow()
-            except Exception as e:
-                logging.warning(f"LSTM prediction skipped: TensorFlow failed to load: {str(e)}")
-                return {'error': 'LSTM prediction unavailable - TensorFlow not loaded'}
-            
-        if not TENSORFLOW_AVAILABLE:
-            logging.warning("LSTM prediction skipped: TensorFlow not available")
-            return {'error': 'LSTM prediction unavailable - TensorFlow not loaded'}
+        # LSTM is disabled due to TensorFlow compatibility issues
+        logging.warning("LSTM prediction disabled: TensorFlow compatibility issue")
+        return {'error': 'LSTM prediction unavailable - TensorFlow compatibility issue'}
         
         try:
             if self.models['lstm'] is None:

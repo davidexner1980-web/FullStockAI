@@ -175,20 +175,42 @@ class FullStockApp {
 
             // LSTM
             const lstmPrediction = data.predictions.lstm?.prediction || data.predictions.lstm;
-            document.getElementById('lstmPrediction').textContent = 
-                data.predictions.lstm ? `$${data.predictions.lstm.toFixed(2)}` : '--';
-            document.getElementById('lstmConfidence').textContent = 
-                data.confidence?.lstm ? `${(data.confidence.lstm * 100).toFixed(1)}% confidence` : '--';
+            const lstmElement = document.getElementById('lstmPrediction');
+            const lstmConfElement = document.getElementById('lstmConfidence');
+            
+            if (lstmElement) {
+                if (data.predictions.lstm && !data.predictions.lstm.error && typeof lstmPrediction === 'number') {
+                    lstmElement.textContent = `$${lstmPrediction.toFixed(2)}`;
+                } else {
+                    lstmElement.textContent = 'Unavailable';
+                }
+            }
+            
+            if (lstmConfElement) {
+                if (data.predictions.lstm?.confidence) {
+                    lstmConfElement.textContent = `${(data.predictions.lstm.confidence * 100).toFixed(1)}% confidence`;
+                } else {
+                    lstmConfElement.textContent = 'TensorFlow compatibility issue';
+                }
+            }
         }
 
         // Ensemble prediction
-        if (data.ensemble_prediction) {
-            document.getElementById('ensemblePrediction').textContent = `$${data.ensemble_prediction.toFixed(2)}`;
+        const ensemblePred = data.predictions?.ensemble?.prediction || data.ensemble_prediction;
+        const ensembleConf = data.predictions?.ensemble?.confidence || data.ensemble_confidence || 0.75;
+        
+        const ensembleElement = document.getElementById('ensemblePrediction');
+        const directionElement = document.getElementById('ensembleDirection');
+        
+        if (ensembleElement && ensemblePred) {
+            ensembleElement.textContent = `$${ensemblePred.toFixed(2)}`;
             
-            const direction = data.ensemble_prediction > data.current_price ? 'BULLISH' : 'BEARISH';
-            const directionClass = direction === 'BULLISH' ? 'text-success' : 'text-danger';
-            document.getElementById('ensembleDirection').innerHTML = 
-                `<span class="${directionClass}">${direction}</span> - ${((data.ensemble_confidence || 0.75) * 100).toFixed(1)}% confidence`;
+            if (directionElement) {
+                const direction = ensemblePred > data.current_price ? 'BULLISH' : 'BEARISH';
+                const directionClass = direction === 'BULLISH' ? 'text-success' : 'text-danger';
+                directionElement.innerHTML = 
+                    `<span class="${directionClass}">${direction}</span> - ${(ensembleConf * 100).toFixed(1)}% confidence`;
+            }
         }
     }
 
