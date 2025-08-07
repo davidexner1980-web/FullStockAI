@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### MASTER BUILD Folder Structure (Updated 2025-08-07)
+### MASTER BUILD Folder Structure (FRONTEND REBUILT 2025-08-07)
 ```
 /project-root/
 ├── server/                    (Main server directory)
@@ -18,29 +18,39 @@ Preferred communication style: Simple, everyday language.
 │   ├── models/                (Trained ML model binaries)
 │   ├── ml/                    (ML pipeline and data fetching)
 │   ├── tasks/                 (Background tasks - APScheduler)
-│   ├── utils/                 (Services and strategic modules)
-│   ├── static/                (CSS, JS, PWA assets)
-│   ├── templates/             (Jinja2 HTML templates)
-│   ├── app.py                 (Main Flask application)
-│   ├── config.py              (Environment configuration)
-│   └── scheduler.py           (Background task scheduler)
-├── frontend/                  (Standalone frontend assets)
-│   ├── js/                    (Advanced JavaScript modules)
-│   ├── css/                   (Responsive Bootstrap styling)
-│   └── index.html             (Complete UI implementation)
+│   └── utils/                 (Services and strategic modules)
+├── frontend/                  (COMPLETELY REBUILT Frontend)
+│   ├── css/
+│   │   └── styles.css         (Bootstrap 5 Dark Theme with glass-morphism)
+│   ├── js/
+│   │   ├── dashboard.js       (Stock analysis with real backend integration)
+│   │   ├── crypto.js          (Cryptocurrency dashboard)
+│   │   ├── oracle.js          (Mystical market insights)
+│   │   ├── portfolio.js       (Portfolio risk assessment)
+│   │   ├── sockets.js         (WebSocket real-time streaming)
+│   │   └── charts.js          (Chart.js with live data visualization)
+│   ├── index.html             (Main stock dashboard)
+│   ├── crypto.html            (Crypto analysis interface)
+│   ├── oracle.html            (Oracle mystical insights)
+│   ├── portfolio.html         (Portfolio risk analyzer)
+│   ├── manifest.json          (PWA configuration)
+│   └── service-worker.js      (Offline caching and PWA support)
 ├── docs/                      (System documentation and reports)
 ├── database/                  (Data storage and logs)
-├── .replit                    (Replit configuration)
-└── main.py                    (Application entry point)
+├── app.py                     (Flask app configured for frontend/ directory)
+├── main.py                    (Application entry point)
+└── .replit                    (Replit configuration)
 ```
 
-### Frontend Architecture
-- **Framework**: Flask-based web application with Bootstrap 5 dark theme
-- **UI Design**: Modern responsive card-based layout with mobile-first approach
-- **Real-time Features**: Socket.IO integration for live price updates and notifications
-- **Progressive Web App**: Service worker implementation for offline functionality and caching
-- **Visualization**: Chart.js integration for dynamic charts and prediction overlays
-- **Mobile Support**: Dedicated mobile CSS and gesture handling
+### Frontend Architecture (COMPLETELY REBUILT 2025-08-07)
+- **Framework**: Complete ground-up rebuild using Bootstrap 5 Dark Theme
+- **Structure**: Clean frontend/ directory with specialized dashboards
+- **UI Design**: Modern responsive card-based layout with mobile-first approach and glass-morphism effects
+- **Real-time Features**: Socket.IO integration for live price updates and notifications with comprehensive error handling
+- **Progressive Web App**: Full PWA support with manifest.json and service-worker.js for offline functionality
+- **Visualization**: Chart.js integration for dynamic charts and prediction overlays with real-time updates
+- **Mobile Support**: Touch-friendly interface with swipe gestures and responsive breakpoints
+- **Multi-Dashboard**: Four specialized interfaces (Stock, Crypto, Oracle, Portfolio) with dedicated JavaScript modules
 
 ### Backend Architecture
 - **Web Framework**: Flask with SQLAlchemy ORM using DeclarativeBase

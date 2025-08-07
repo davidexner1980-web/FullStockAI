@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Analyzer - FullStock AI vNext Ultimate</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i data-feather="trending-up" class="me-2"></i>
+                FullStock AI vNext Ultimate
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i data-feather="home" class="me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="crypto.html">
+                            <i data-feather="dollar-sign" class="me-1"></i>Crypto
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="oracle.html">
+                            <i data-feather="eye" class="me-1"></i>Oracle
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="portfolio.html">
+                            <i data-feather="briefcase" class="me-1"></i>Portfolio
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Connection Status -->
+                <div class="navbar-text ms-3">
+                    <span class="status-indicator status-online" id="connectionStatus"></span>
+                    <span id="connectionText">Live</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Portfolio Dashboard -->
+    <div class="container-fluid py-4">
+        <!-- Portfolio Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i data-feather="briefcase" class="me-2"></i>
+                            Portfolio Analysis & Risk Assessment
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-end">
+                            <div class="col-md-6 mb-3">
+                                <label for="portfolioInput" class="form-label">Portfolio Symbols (comma-separated)</label>
+                                <div class="input-group">
+                                    <input type="text" 
+                                           id="portfolioInput" 
+                                           class="form-control" 
+                                           placeholder="e.g., AAPL,MSFT,GOOGL,TSLA,SPY" 
+                                           value="AAPL,MSFT,GOOGL,TSLA,SPY"
+                                           autocomplete="off">
+                                    <button class="btn btn-primary" type="button" id="analyzePortfolioBtn">
+                                        <i data-feather="zap" class="me-1"></i>
+                                        <span id="analyzePortfolioText">Analyze Portfolio</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Quick Portfolios</label>
+                                <div class="btn-group w-100" role="group">
+                                    <button type="button" class="btn btn-outline-light btn-sm quick-portfolio" data-portfolio="AAPL,MSFT,GOOGL">Tech</button>
+                                    <button type="button" class="btn btn-outline-light btn-sm quick-portfolio" data-portfolio="JPM,BAC,WFC,GS">Finance</button>
+                                    <button type="button" class="btn btn-outline-light btn-sm quick-portfolio" data-portfolio="SPY,QQQ,IWM,VTI">ETF</button>
+                                    <button type="button" class="btn btn-outline-light btn-sm quick-portfolio" data-portfolio="BTC-USD,ETH-USD,ADA-USD">Crypto</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Overview -->
+        <div class="row mb-4" id="portfolioOverviewSection" style="display: none;">
+            <div class="col-md-3 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Total Value</h6>
+                        <div class="h4 text-gradient" id="totalValue">$---</div>
+                        <small class="text-muted" id="totalChange">--</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Daily P&L</h6>
+                        <div class="h4" id="dailyPL">$---</div>
+                        <small class="text-muted" id="dailyPLPercent">--%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Portfolio Beta</h6>
+                        <div class="h4" id="portfolioBeta">--</div>
+                        <small class="text-muted">vs S&P 500</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Sharpe Ratio</h6>
+                        <div class="h4" id="sharpeRatio">--</div>
+                        <small class="text-muted">Risk-Adjusted Return</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Assessment & Recommendations -->
+        <div class="row mb-4" id="riskAssessmentSection" style="display: none;">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i data-feather="shield" class="me-2"></i>
+                            Risk Assessment
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Overall Risk Level</span>
+                                <span id="riskLevel" class="badge bg-secondary">--</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" id="riskProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Diversification Score</span>
+                                <span id="diversificationScore">--%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" id="diversificationBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Volatility (30D)</span>
+                                <span id="volatility30D">--%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <span>Max Drawdown</span>
+                            <span id="maxDrawdown" class="text-danger">--%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i data-feather="target" class="me-2"></i>
+                            AI Recommendations
+                        </h6>
+                    </div>
+                    <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+                        <div id="aiRecommendations">
+                            <p class="text-muted text-center">Analyzing portfolio composition...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Allocation & Performance -->
+        <div class="row mb-4" id="portfolioChartsSection" style="display: none;">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i data-feather="pie-chart" class="me-2"></i>
+                            Asset Allocation
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="allocationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i data-feather="trending-up" class="me-2"></i>
+                            Performance vs Benchmark
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Holdings Analysis -->
+        <div class="row mb-4" id="holdingsSection" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0">
+                                <i data-feather="list" class="me-2"></i>
+                                Holdings Analysis
+                            </h6>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-light holdings-sort active" data-sort="weight">Weight</button>
+                                <button type="button" class="btn btn-outline-light holdings-sort" data-sort="return">Return</button>
+                                <button type="button" class="btn btn-outline-light holdings-sort" data-sort="risk">Risk</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Weight</th>
+                                        <th>Current Price</th>
+                                        <th>1D Change</th>
+                                        <th>Prediction</th>
+                                        <th>Risk Score</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="holdingsTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">Loading holdings...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Portfolio Updates -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i data-feather="activity" class="me-2"></i>
+                            Live Portfolio Updates
+                        </h6>
+                    </div>
+                    <div class="card-body" style="max-height: 200px; overflow-y: auto;">
+                        <div id="portfolioUpdates">
+                            <p class="text-muted text-center">Waiting for portfolio analysis...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="portfolioLoadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.8); z-index: 9999; display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <h5>Analyzing Portfolio...</h5>
+            <p class="text-muted" id="portfolioLoadingText">Calculating risk metrics</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/sockets.js"></script>
+    <script src="js/portfolio.js"></script>
+    
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Initialize Portfolio Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePortfolioDashboard();
+            
+            // Auto-analyze default portfolio on load
+            setTimeout(() => {
+                analyzePortfolio('AAPL,MSFT,GOOGL,TSLA,SPY');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

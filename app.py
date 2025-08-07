@@ -21,10 +21,10 @@ socketio = SocketIO()
 cache = Cache()
 mail = Mail()
 
-# Create the app with correct template and static folders
+# Create the app with new frontend directory structure  
 app = Flask(__name__, 
-           template_folder='server/templates',
-           static_folder='server/static')
+           template_folder='frontend',
+           static_folder='frontend')
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback-secret-key-for-development")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
