@@ -1,6 +1,6 @@
 import random
 from datetime import datetime
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 from sentiment_analyzer import SentimentAnalyzer
 import json
 import os

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 from trading_strategies import TradingStrategies
 import logging
 

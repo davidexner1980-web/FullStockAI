@@ -282,7 +282,7 @@ class CacheManager:
             Dictionary with warming results
         """
         try:
-            from data_fetcher import DataFetcher
+            from backend.data_fetcher import DataFetcher
             
             data_fetcher = DataFetcher()
             warmed_count = 0

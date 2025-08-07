@@ -325,6 +325,25 @@ class FullStockApp {
       }
     }
     
+    try {
+      const response = await fetch(`/api/predict/${ticker}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      // Cache the result
+      this.cache.set(cacheKey, {
+        data: data,
+        timestamp: Date.now()
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Search error:', error);
+      throw error;
+    }
+    
     const response = await fetch(`/api/predict/${ticker}`);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);

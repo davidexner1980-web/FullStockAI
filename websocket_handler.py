@@ -1,9 +1,9 @@
 from flask_socketio import emit, join_room, leave_room, disconnect
 from app import socketio, app
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 from ml_models import MLModelManager
 from oracle_engine import OracleEngine
-from crypto_predictor import CryptoPredictorEngine
+from backend.crypto_predictor import CryptoPredictorEngine
 import threading
 import time
 import logging

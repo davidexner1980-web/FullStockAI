@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import logging
 import pandas as pd
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 
 class OracleMode:
     """Mystical Oracle Mode for market insights and predictions"""

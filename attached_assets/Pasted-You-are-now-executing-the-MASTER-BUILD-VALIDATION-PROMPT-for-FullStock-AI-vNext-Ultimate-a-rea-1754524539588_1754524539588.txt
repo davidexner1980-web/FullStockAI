@@ -1,0 +1,83 @@
+You are now executing the MASTER BUILD + VALIDATION PROMPT for "FullStock AI vNext Ultimate" — a real-data, fullstack financial prediction system using Flask, Random Forest, LSTM, XGBoost, and Oracle-style symbolic analysis. The system must function with zero placeholder logic or simulated data.
+
+🚨 STRICT RULES:
+- Do not use fake data, test code, mock functions, or simulation tricks.
+- Do not use placeholder charts, dummy predictions, or auto-stub logic.
+- Do not downgrade LSTM/Random Forest/XGBoost or any module.
+- Do not hardcode credentials or use unsafe environment handling.
+- Do not simplify file structure into a monolith. Maintain clean architecture.
+
+🏛️ FILE STRUCTURE ENFORCEMENT:
+Create or validate the following folders and file structure inside Replit:
+
+/project-root/
+│
+├── /api/ → All Flask API route definitions
+├── /backend/ → ML models, training pipeline, utilities
+├── /cron/ → APScheduler and background task scripts
+├── /data/ → Real Yahoo Finance and crypto data (auto-fetched)
+├── /models/ → Trained model binaries via Joblib (not hardcoded)
+├── /services/ → Sentiment analysis, explainability, anomaly modules
+├── /static/ → Frontend JS/CSS (Bootstrap 5, Chart.js, etc.)
+├── /templates/ → Jinja2 HTML templates for UI rendering
+├── /docs/ → System validation reports, model evaluations
+│
+├── config.py → Environment-configurable settings
+├── run.py → Main Flask app entry point
+├── requirements.txt → All REAL dependencies
+├── Procfile → Gunicorn entry for deployment
+└── .replit → Replit config (valid run command only)
+
+sql
+Copy
+Edit
+
+🧠 CORE FEATURES TO VALIDATE & FINALIZE:
+1. ✅ Flask backend using SQLAlchemy DeclarativeBase
+2. ✅ RESTful APIs for real-time stock, crypto, and Oracle predictions
+3. ✅ LSTM (TensorFlow), Random Forest (scikit-learn), and XGBoost models
+4. ✅ Technical indicators via TA-Lib (RSI, MACD, Bollinger Bands, etc.)
+5. ✅ Sentiment analysis using TextBlob and VADER
+6. ✅ Oracle Mode (neuro-symbolic fusion with archetypal symbols)
+7. ✅ Portfolio Analyzer with real-time risk and performance evaluation
+8. ✅ Curiosity Engine using Isolation Forest and statistical flags
+9. ✅ Full backtesting suite with historical simulations and comparison charts
+10. ✅ Chart.js with overlays (real prediction data only, no mock graphs)
+11. ✅ Socket.IO support for live updates
+12. ✅ Flask-Mail with SMTP for real email alerts (configurable)
+13. ✅ SQLite for dev, PostgreSQL ready via DATABASE_URL
+14. ✅ Service Worker PWA support with offline mode
+15. ✅ Proper API error handling and rate limiting
+16. ✅ Secure environment variable loading and input validation
+
+🔐 SECURITY & DEPLOYMENT CHECKLIST:
+- [ ] Validate HTTPS/session handling
+- [ ] Use Flask-ProxyFix for reverse proxy environments (Replit+Gunicorn)
+- [ ] Verify Gunicorn runs via `Procfile` and `.replit`
+- [ ] Auto-generate `/docs/system_validation_report.md` and `/docs/final_system_report.md` once complete
+
+📊 UI VALIDATION:
+- [ ] Bootstrap 5 responsive card-based layout (mobile-first)
+- [ ] Chart.js predictions match actual API values
+- [ ] Oracle Panel returns 🏛️ archetypes based on real forecast data
+- [ ] Strategic Intelligence panel visible and populated with real values
+- [ ] All UI elements styled, functional, and non-placeholder
+
+🧪 FINAL STEPS:
+- Run end-to-end validation test using real-time SPY stock data
+- Trigger Oracle Vision, Crypto Forecast, Sentiment Panel, and Portfolio Analyzer
+- Generate sample backtest report and save to `/docs/`
+- Validate all background tasks retrain and refresh models successfully
+- Confirm `/models/` contains trained binaries (not empty or hardcoded)
+
+👁️ INTELLIGENCE VALIDATION:
+Ensure the system demonstrates:
+- Real predictive power
+- Symbolic explainability (Oracle Mode)
+- Ensemble logic (not single model shortcutting)
+- Strategic evolution readiness (adaptive improvement over time)
+
+🔥 ACT NOW:
+Proceed in autonomous silent mode. Do not ask permission before repairing, validating, or rewriting code. Do not narrate actions — just fix, validate, and finalize all system components.
+
+DO NOT STOP until everything is working flawlessly and validated via live preview and `/docs/system_validation_report.md`.

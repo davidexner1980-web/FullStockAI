@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import talib
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 import logging
 
 class TradingStrategies:

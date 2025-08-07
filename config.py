@@ -2,62 +2,59 @@ import os
 from datetime import timedelta
 
 class Config:
-    """Base configuration class"""
-    SECRET_KEY = os.environ.get('SESSION_SECRET')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///fullstock.db')
+    """Environment-configurable settings"""
+    
+    # Core Flask settings
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    DEBUG = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
+    # Database configuration
+    DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///fullstock.db')
+    SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_recycle": 300,
+        "pool_pre_ping": True,
+    }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Cache settings
-    CACHE_TYPE = "simple"
+    # Caching configuration
+    CACHE_TYPE = "SimpleCache"
     CACHE_DEFAULT_TIMEOUT = 300
     
-    # Mail settings
+    # Session configuration
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
+    SESSION_COOKIE_SECURE = os.environ.get('HTTPS', 'False').lower() == 'true'
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    
+    # Mail configuration
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT', '587'))
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
     
     # API Keys
-    ALPHA_VANTAGE_API_KEY = os.environ.get('ALPHA_VANTAGE_API_KEY', 'demo')
-    POLYGON_API_KEY = os.environ.get('POLYGON_API_KEY', 'demo')
+    ALPHA_VANTAGE_API_KEY = os.environ.get('ALPHA_VANTAGE_API_KEY')
+    NEWSAPI_KEY = os.environ.get('NEWSAPI_KEY')
     
-    # Model settings
-    MODEL_CACHE_TIMEOUT = 3600  # 1 hour
-    PREDICTION_CACHE_TIMEOUT = 300  # 5 minutes
+    # Model training configuration
+    MODEL_RETRAIN_INTERVAL = int(os.environ.get('MODEL_RETRAIN_INTERVAL', 24))  # hours
+    MODEL_CACHE_TTL = int(os.environ.get('MODEL_CACHE_TTL', 300))  # seconds
     
-    # Oracle mode settings
-    ORACLE_EMOTIONAL_STATES = [
-        'ECSTASY', 'SERENITY', 'WONDER', 'CONTEMPLATION', 
-        'MELANCHOLY', 'DREAD'
-    ]
+    # Oracle mode configuration
+    ORACLE_MODE_ENABLED = os.environ.get('ORACLE_MODE_ENABLED', 'True').lower() == 'true'
+    MYSTICAL_SYMBOLS_ENABLED = True
     
-    # Crypto settings
-    SUPPORTED_CRYPTOS = [
-        'BTC-USD', 'ETH-USD', 'ADA-USD', 'DOT-USD', 'LINK-USD',
-        'LTC-USD', 'BCH-USD', 'XLM-USD', 'VET-USD', 'UNI-USD'
-    ]
-    
-    # WebSocket settings
-    SOCKETIO_ASYNC_MODE = 'threading'
+    # Performance settings
+    MAX_CONCURRENT_PREDICTIONS = int(os.environ.get('MAX_CONCURRENT_PREDICTIONS', 10))
+    REQUEST_TIMEOUT = int(os.environ.get('REQUEST_TIMEOUT', 30))
     
     # Rate limiting
-    API_RATE_LIMIT = 100  # requests per minute
-
-class DevelopmentConfig(Config):
-    """Development configuration"""
-    DEBUG = True
-    SQLALCHEMY_ECHO = True
-
-class ProductionConfig(Config):
-    """Production configuration"""
-    DEBUG = False
-    SQLALCHEMY_ECHO = False
-
-# Configuration dictionary
-config = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'default': DevelopmentConfig
-}
+    RATELIMIT_ENABLED = os.environ.get('RATELIMIT_ENABLED', 'True').lower() == 'true'
+    RATELIMIT_DEFAULT = "100 per hour"
+    
+    # Security settings
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_TIME_LIMIT = 3600

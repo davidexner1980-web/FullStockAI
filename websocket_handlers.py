@@ -1,7 +1,7 @@
 from flask_socketio import emit, join_room, leave_room, disconnect
 from app import socketio, db
 from models import WatchlistItem, Alert
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 import logging
 import threading
 import time
@@ -102,7 +102,7 @@ def handle_prediction_request(data):
         
         # Import here to avoid circular imports
         from ml_models import MLModelManager
-        from crypto_predictor import CryptocurrencyPredictor
+        from backend.crypto_predictor import CryptocurrencyPredictor
         
         ml_manager = MLModelManager()
         crypto_predictor = CryptocurrencyPredictor()

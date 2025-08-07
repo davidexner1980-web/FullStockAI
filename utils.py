@@ -4,7 +4,7 @@ import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import pandas as pd
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 from app import db
 from models import Stock, PriceHistory, Prediction
 

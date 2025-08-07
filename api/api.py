@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
 from flask_socketio import emit
 from app import cache, socketio
-from services.data_fetcher import DataFetcher
-from services.ml_models import MLModelManager
+from backend.data_fetcher import DataFetcher
+from backend.ml_models import MLModelManager
 from services.oracle_service import OracleService
 from services.crypto_service import CryptoService
 from services.backtesting import BacktestingEngine

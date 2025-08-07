@@ -65,8 +65,8 @@ with app.app_context():
     os.makedirs("static/icons", exist_ok=True)
 
 # Import and register blueprints
-from routes.main import main_bp
-from routes.api import api_bp
+from api.main import main_bp
+from api.api import api_bp
 
 app.register_blueprint(main_bp)
 app.register_blueprint(api_bp, url_prefix='/api')

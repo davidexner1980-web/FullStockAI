@@ -3,11 +3,11 @@ from flask_socketio import emit
 from app import app, db, cache, socketio
 from models import User, Portfolio, PortfolioHolding, Watchlist, PriceAlert, Prediction, BacktestResult
 from ml_models import MLModelManager
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 from sentiment_analyzer import SentimentAnalyzer
 from trading_strategies import TradingStrategies
 from oracle_engine import OracleEngine
-from crypto_predictor import CryptoPredictorEngine
+from backend.crypto_predictor import CryptoPredictorEngine
 from portfolio_manager import PortfolioManager
 from backtesting_engine import BacktestingEngine
 from notification_service import NotificationService

@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler
 import xgboost as xgb
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 import logging
 
 # Conditional TensorFlow imports - won't crash app if TensorFlow has issues

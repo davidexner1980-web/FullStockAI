@@ -1,7 +1,7 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import requests
 from bs4 import BeautifulSoup
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 import logging
 import time
 

@@ -1,6 +1,6 @@
 from app import app, db, scheduler
 from models import User, WatchlistItem, Alert, Prediction
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 from ml_models import MLModelManager
 import logging
 from datetime import datetime, timedelta

@@ -4,7 +4,7 @@ import logging
 from datetime import datetime, timedelta
 import yfinance as yf
 from services.data_fetcher import DataFetcher
-from services.ml_models import MLModelManager
+from backend.ml_models import MLModelManager
 import json
 
 class BacktestingEngine:

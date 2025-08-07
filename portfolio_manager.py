@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from data_fetcher import DataFetcher
+from backend.data_fetcher import DataFetcher
 from ml_models import MLModelManager
-from crypto_predictor import CryptoPredictorEngine
+from backend.crypto_predictor import CryptoPredictorEngine
 import logging
 import json
 
