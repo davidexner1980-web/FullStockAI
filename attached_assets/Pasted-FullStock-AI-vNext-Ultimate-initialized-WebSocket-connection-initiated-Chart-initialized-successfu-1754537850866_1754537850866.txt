@@ -1,0 +1,63 @@
+FullStock AI vNext Ultimate initialized
+WebSocket connection initiated
+Chart initialized successfully
+Dashboard initialized successfully
+Analyzing SPY...
+WebSocket connection error: 
+Error {}
+
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+Analysis successful, updating UI... 
+Object {agreement_level: 0.9503477429842391, current_price: 632.780029296875, predictions: {…}, ticker: "SPY", timestamp: "2025-08-07 03:35:31+00:00"}
+Updating prediction display with data: 
+Object {agreement_level: 0.9503477429842391, current_price: 632.780029296875, predictions: {…}, ticker: "SPY", timestamp: "2025-08-07 03:35:31+00:00"}
+Setting current price: 632.780029296875
+Current price element text now: $632.78
+Updating individual predictions: 
+Object {ensemble: {…}, lstm: {…}, random_forest: {…}, xgboost: {…}}
+Setting RF prediction: 593.9526171252537
+RF element text now: $593.95
+Updating ensemble prediction: 602.4309423620638 75
+WebSocket connection error: 
+Error {}
+
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+Chart data error: 
+Error {}
+message: "Chart data fetch failed"
+stack: "Error: Chart data fetch failed↵ at loadChartData (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/frontend/js/dashboard.js:213:33)↵ at async analyzeStock (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/frontend/js/dashboard.js:112:9)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+Showing results section
+Results section is now visible
+WebSocket connection error: 
+Error {}
+
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+WebSocket connection error: 
+Error {}
+
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+WebSocket connection error: 
+Error {}
+
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://8152fcfe-4491-4392-92a6-9fd80ecdae1e-00-3i2m6oi5zbymi.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+WebSocket connection error: 
+Error {}

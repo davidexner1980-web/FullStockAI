@@ -209,11 +209,13 @@ function updatePredictionDisplay(data) {
  */
 async function loadChartData(ticker, period = '1mo') {
     try {
-        const response = await fetch(`/api/chart_data/${ticker}?period=${period}`);
+        const response = await fetch(`/api/history/${ticker}?period=${period}`);
         if (!response.ok) throw new Error('Chart data fetch failed');
         
         const data = await response.json();
+        console.log('Updating chart with data:', data);
         updateChart(data);
+        console.log('Chart updated successfully');
         
     } catch (error) {
         console.error('Chart data error:', error);
