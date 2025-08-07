@@ -3,19 +3,19 @@ import multiprocessing
 
 # Server socket
 bind = "0.0.0.0:5000"
-backlog = 2048
+backlog = 512
 
 # Worker processes  
-workers = 1  # Flask-SocketIO works best with 1 worker
+workers = 1  # Flask-SocketIO requires exactly 1 worker
 worker_class = "eventlet"  # Use eventlet for WebSocket support
-worker_connections = 1000
-timeout = 30  # Standard timeout
-keepalive = 2
+worker_connections = 100
+timeout = 60  # Increased timeout for SocketIO
+keepalive = 5
 
-# Restart workers
-max_requests = 1000
-max_requests_jitter = 50
-preload_app = True
+# Restart workers - reduced to prevent socket issues
+max_requests = 500
+max_requests_jitter = 25
+preload_app = False  # Disable preloading to prevent socket issues
 
 # Logging
 loglevel = "info"
@@ -30,3 +30,7 @@ proc_name = "fullstock_ai"
 limit_request_line = 4094
 limit_request_fields = 100
 limit_request_field_size = 8190
+
+# SocketIO specific settings
+graceful_timeout = 10
+worker_tmp_dir = "/dev/shm"
