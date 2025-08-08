@@ -462,7 +462,8 @@ def get_portfolio_analysis(symbol):
     """Portfolio analysis for symbol"""
     try:
         symbol = symbol.upper()
-        portfolio_data = portfolio_manager.analyze_portfolio(symbol)
+        # Analyze portfolio expects a list of tickers
+        portfolio_data = portfolio_manager.analyze_portfolio([symbol])
         return jsonify({
             'symbol': symbol,
             'portfolio_analysis': portfolio_data,

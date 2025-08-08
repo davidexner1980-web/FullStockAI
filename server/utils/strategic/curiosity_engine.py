@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 from sklearn.ensemble import IsolationForest
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from server.utils.services.data_fetcher import DataFetcher
+from server.ml.data_fetcher import DataFetcher
+from server.ml.ml_models import MLModelManager
 import json
 import os
 
@@ -14,6 +15,7 @@ class CuriosityEngine:
     
     def __init__(self):
         self.data_fetcher = DataFetcher()
+        self.ml_manager = MLModelManager()
         self.scaler = StandardScaler()
         self.anomaly_threshold = 0.1  # Threshold for anomaly detection
         self.curiosity_levels = ['LOW', 'MEDIUM', 'HIGH', 'EXTREME']
@@ -21,10 +23,15 @@ class CuriosityEngine:
     def analyze_anomalies(self, ticker):
         """Comprehensive anomaly detection and curiosity analysis"""
         try:
-            # Get extended data for better anomaly detection
-            data = self.data_fetcher.get_stock_data(ticker, period='6mo')
-            if data is None:
+            # Get processed data with technical indicators from ML pipeline
+            raw_data = self.data_fetcher.get_stock_data(ticker, period='6mo')
+            if raw_data is None or raw_data.empty:
                 return {'error': 'Failed to fetch data for curiosity analysis'}
+            
+            # Use ML model manager to get processed data with technical indicators
+            data = self.ml_manager._calculate_technical_indicators(raw_data.copy())
+            if data is None or data.empty:
+                return {'error': 'Failed to process technical indicators'}
             
             # Prepare features for anomaly detection
             features = self._prepare_anomaly_features(data)
@@ -95,16 +102,29 @@ class CuriosityEngine:
             # Filter available columns
             available_columns = [col for col in feature_columns if col in data.columns]
             
-            if len(available_columns) < 5:
-                logging.warning("Insufficient features for anomaly detection")
-                return None
+            if len(available_columns) < 3:  # Reduced threshold since we have basic data
+                logging.warning(f"Insufficient features for anomaly detection. Available: {available_columns}")
+                # Use basic features if technical indicators not available
+                basic_features = ['Close', 'Volume', 'Open', 'High', 'Low']
+                available_columns = [col for col in basic_features if col in data.columns]
+                
+                if len(available_columns) < 3:
+                    logging.error(f"Insufficient basic features. Available: {available_columns}")
+                    return None
             
             # Extract features
             features = data[available_columns].fillna(method='ffill').fillna(0)
             
             # Add derived features
             features['price_volume_ratio'] = features['Close'] / (features['Volume'] + 1)
-            features['rsi_divergence'] = abs(features['RSI'] - 50)
+            
+            # Add RSI divergence only if RSI exists
+            if 'RSI' in features.columns:
+                features['rsi_divergence'] = abs(features['RSI'] - 50)
+            else:
+                # Calculate simple price divergence as fallback
+                rolling_mean = features['Close'].rolling(20).mean()
+                features['price_divergence'] = abs(features['Close'] - rolling_mean)
             
             # Calculate rolling statistics for anomaly detection
             window = min(20, len(features) // 4)

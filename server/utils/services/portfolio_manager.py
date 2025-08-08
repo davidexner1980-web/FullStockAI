@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 from datetime import datetime, timedelta
-from server.utils.services.data_fetcher import DataFetcher
+from server.ml.data_fetcher import DataFetcher
 import logging
 
 class PortfolioManager:
@@ -77,7 +77,7 @@ class PortfolioManager:
             price_data = {}
             for ticker in tickers:
                 try:
-                    data = self.data_fetcher.get_historical_data(ticker, period='1y')
+                    data = self.data_fetcher.get_stock_data(ticker, period='1y')
                     price_data[ticker] = data['Close']
                 except:
                     logging.warning(f"Could not fetch data for {ticker}")
@@ -286,7 +286,7 @@ class PortfolioManager:
             price_data = {}
             for ticker in tickers:
                 try:
-                    data = self.data_fetcher.get_historical_data(ticker, period='1y')
+                    data = self.data_fetcher.get_stock_data(ticker, period='1y')
                     price_data[ticker] = data['Close']
                 except:
                     continue

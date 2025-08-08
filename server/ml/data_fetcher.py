@@ -4,11 +4,30 @@ import requests
 from datetime import datetime, timedelta
 import logging
 import time
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 class DataFetcher:
     def __init__(self):
         self.cache = {}
         self.cache_duration = 300  # 5 minutes
+        self.session = self._create_session()
+        
+    def _create_session(self):
+        """Create a robust requests session with retry logic"""
+        session = requests.Session()
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+        session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        })
+        return session
         
     def get_stock_data(self, ticker, period='1y', interval='1d'):
         """Fetch stock data from Yahoo Finance"""
@@ -21,9 +40,15 @@ class DataFetcher:
                 if time.time() - timestamp < self.cache_duration:
                     return data
             
-            # Fetch fresh data
-            stock = yf.Ticker(ticker)
-            df = stock.history(period=period, interval=interval)
+            # Fetch fresh data with session
+            try:
+                stock = yf.Ticker(ticker, session=self.session)
+                df = stock.history(period=period, interval=interval)
+            except Exception as session_error:
+                # Fallback without session
+                logging.warning(f"Session error for {ticker}, using fallback: {str(session_error)}")
+                stock = yf.Ticker(ticker)
+                df = stock.history(period=period, interval=interval)
             
             if df.empty:
                 logging.warning(f"No data found for ticker {ticker}")
@@ -253,3 +278,70 @@ class DataFetcher:
         except Exception as e:
             logging.error(f"Error fetching trending crypto: {str(e)}")
             return []
+    
+    def get_real_time_price(self, ticker):
+        """Get real-time price data for a ticker"""
+        try:
+            cache_key = f"{ticker}_realtime"
+            
+            # Check cache (shorter duration for real-time)
+            if cache_key in self.cache:
+                data, timestamp = self.cache[cache_key]
+                if time.time() - timestamp < 60:  # 1 minute cache for real-time
+                    return data
+            
+            # Fetch fresh real-time data
+            try:
+                stock = yf.Ticker(ticker, session=self.session)
+                info = stock.info
+                hist = stock.history(period='2d', interval='1m')
+            except Exception as session_error:
+                # Fallback without session
+                logging.warning(f"Session error for real-time {ticker}, using fallback: {str(session_error)}")
+                stock = yf.Ticker(ticker)
+                info = stock.info
+                hist = stock.history(period='2d', interval='1m')
+            
+            if hist.empty:
+                # Try daily data as fallback
+                hist = stock.history(period='5d', interval='1d')
+            
+            if hist.empty:
+                raise ValueError(f"No price data available for {ticker}")
+            
+            current_price = hist['Close'].iloc[-1]
+            
+            # Calculate change from previous close
+            if len(hist) > 1:
+                previous_price = hist['Close'].iloc[-2]
+                change = current_price - previous_price
+                change_percent = (change / previous_price) * 100 if previous_price > 0 else 0
+            else:
+                change = 0
+                change_percent = 0
+            
+            result = {
+                'current_price': round(float(current_price), 2),
+                'change': round(float(change), 2),
+                'change_percent': round(float(change_percent), 2),
+                'volume': int(hist['Volume'].iloc[-1]) if 'Volume' in hist.columns else 0,
+                'timestamp': datetime.now().isoformat(),
+                'ticker': ticker
+            }
+            
+            # Cache the result
+            self.cache[cache_key] = (result, time.time())
+            
+            return result
+            
+        except Exception as e:
+            logging.error(f"Error fetching real-time price for {ticker}: {str(e)}")
+            return {
+                'current_price': 0.0,
+                'change': 0.0,
+                'change_percent': 0.0,
+                'volume': 0,
+                'timestamp': datetime.now().isoformat(),
+                'ticker': ticker,
+                'error': str(e)
+            }

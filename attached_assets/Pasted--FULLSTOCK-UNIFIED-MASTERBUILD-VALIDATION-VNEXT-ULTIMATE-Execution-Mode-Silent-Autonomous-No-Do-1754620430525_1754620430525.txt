@@ -1,0 +1,137 @@
+🛠 FULLSTOCK_UNIFIED_MASTERBUILD_VALIDATION_VNEXT_ULTIMATE
+Execution Mode: Silent, Autonomous, No Downgrades, No Placeholders
+Core Rule: 100% complete, production-ready program — fully functional from frontend to backend with real data integration.
+
+🎯 MASTER OBJECTIVES
+Rebuild + Validate Entire System
+
+Rebuild frontend UI from scratch using real backend data.
+
+Validate backend models, APIs, and tasks.
+
+Enforce clean, modular code across the project.
+
+Remove All Placeholders
+
+No “demo”, “test”, or “sample” data anywhere.
+
+No hardcoded chart series or fake outputs.
+
+No empty HTML/JS/CSS for “future features”.
+
+Enforce File & Folder Structure
+
+csharp
+Copy
+/
+├── server/
+│   ├── api/                # Flask routes
+│   ├── models/             # DB + ML models
+│   ├── ml/                 # ML training/prediction
+│   ├── tasks/              # APScheduler tasks
+│   ├── utils/              # Helper functions
+│   ├── static/             # css/js/images
+│   ├── templates/          # HTML pages
+│   ├── app.py
+│   ├── config.py
+│   ├── scheduler.py
+│   └── requirements.txt
+├── frontend/
+│   ├── css/
+│   ├── js/
+│   ├── index.html
+│   ├── crypto.html
+│   ├── oracle.html
+│   └── portfolio.html
+├── docs/
+│   ├── system_validation_report.md
+│   └── final_system_report.md
+├── database/
+│   └── fullstock.db
+├── .replit
+├── replit.nix (if needed)
+└── README.md
+🔧 BACKEND VALIDATION
+APIs:
+/api/predict/<symbol>
+/api/sentiment/<symbol>
+/api/oracle_vision/<symbol>
+/api/oracle_dreams
+/api/portfolio/<symbol>
+/api/model_status
+/api/curiosity/<symbol>
+✅ All must return real live data from Yahoo Finance + ML predictions.
+
+Models:
+
+Train & validate Random Forest, LSTM, XGBoost.
+
+Ensure accuracy > baseline thresholds.
+
+Store models in /models/ with Joblib or Keras save.
+
+Scheduler:
+
+Retrains models & updates market data automatically.
+
+No skipped jobs.
+
+Database:
+
+SQLite for dev, PostgreSQL for prod.
+
+No in-memory DB use.
+
+🎨 FRONTEND REBUILD REQUIREMENTS
+Framework: Bootstrap 5 dark theme, mobile-first.
+
+Charts: Chart.js linked to live API data.
+
+Live Updates: Socket.IO streaming for prices + predictions.
+
+Pages:
+
+Dashboard (stocks)
+
+Crypto Dashboard
+
+Oracle Insights
+
+Portfolio Analyzer
+
+Model Health Monitor
+
+Sentiment Panel
+
+UI Rules:
+
+Card-based layout.
+
+No unused assets.
+
+All buttons/controls functional.
+
+🔁 INTEGRATION CHECKS
+Frontend ↔ Backend communication functional.
+
+No CORS or missing endpoint issues.
+
+All displayed values from real backend queries.
+
+Offline caching + PWA installable.
+
+📜 OUTPUT REPORTS
+/docs/system_validation_report.md — API test results, frontend render status, ML model metrics.
+
+/docs/final_system_report.md — Final architecture summary, data source confirmations, performance benchmarks.
+
+🚀 EXECUTION RULES
+Run silently, fix issues on detection.
+
+Remove duplicate or unused files immediately.
+
+Maintain full model complexity — no downgrades.
+
+Refactor if code violates clean coding principles.
+
+Final build must be 100% functional in Replit Preview.

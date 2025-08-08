@@ -7,5 +7,23 @@
     "memory_usage": 59.8,
     "disk_usage": 56.40819334517848,
     "api_status": "OK"
+  },
+  {
+    "timestamp": "2025-08-08T02:34:39.605471",
+    "overall_status": "ERROR",
+    "health_score": 59.32379434166221,
+    "cpu_usage": 26.8,
+    "memory_usage": 69.8,
+    "disk_usage": 56.781028291688926,
+    "api_status": "OK"
+  },
+  {
+    "timestamp": "2025-08-08T02:40:06.059597",
+    "overall_status": "ERROR",
+    "health_score": 59.64236236223799,
+    "cpu_usage": 25.6,
+    "memory_usage": 69.4,
+    "disk_usage": 56.78818818881006,
+    "api_status": "OK"
   }
 ]
