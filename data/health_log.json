@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "timestamp": "2025-08-08T01:45:22.997628",
+    "overall_status": "ERROR",
+    "health_score": 56.91836133096431,
+    "cpu_usage": 49.2,
+    "memory_usage": 59.8,
+    "disk_usage": 56.40819334517848,
+    "api_status": "OK"
+  }
+]

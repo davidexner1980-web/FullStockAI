@@ -7,18 +7,26 @@ from server.utils.services.oracle_service import OracleService
 from server.utils.services.crypto_service import CryptoService
 from server.utils.services.backtesting import BacktestingEngine
 from server.utils.services.notification_service import NotificationService
+from server.utils.services.sentiment_analyzer import SentimentAnalyzer
+from server.utils.strategic.curiosity_engine import CuriosityEngine
+from server.utils.strategic.health_monitor import HealthMonitor
+from server.utils.services.portfolio_manager import PortfolioManager
 import logging
 from datetime import datetime
 
 api_bp = Blueprint('api', __name__)
 
-# Initialize core services only (remove problematic strategic services for now)
+# Initialize all services for FULLSTOCK specification
 data_fetcher = DataFetcher()
 ml_manager = MLModelManager()
 oracle_service = OracleService()
 crypto_service = CryptoService()
 backtesting_engine = BacktestingEngine()
 notification_service = NotificationService()
+sentiment_analyzer = SentimentAnalyzer()
+curiosity_engine = CuriosityEngine()
+health_monitor = HealthMonitor()
+portfolio_manager = PortfolioManager()
 
 @api_bp.route('/predict/<ticker>')
 @cache.cached(timeout=300)
@@ -399,3 +407,97 @@ def handle_live_data_request(data):
         logging.error(f"Live data request error: {str(e)}")
         ticker_name = data.get('ticker', 'unknown') if data else 'unknown'
         emit('error', {'message': f'Failed to get live data for {ticker_name}: {str(e)}'})
+
+# FULLSTOCK SPECIFICATION - Missing API Endpoints
+
+@api_bp.route('/sentiment/<symbol>')
+@cache.cached(timeout=300)
+def get_sentiment(symbol):
+    """Sentiment analysis endpoint"""
+    try:
+        symbol = symbol.upper()
+        sentiment_data = sentiment_analyzer.analyze_sentiment(symbol)
+        return jsonify({
+            'symbol': symbol,
+            'sentiment': sentiment_data,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        logging.error(f"Sentiment analysis error: {str(e)}")
+        return jsonify({'error': f'Sentiment analysis failed: {str(e)}'}), 500
+
+@api_bp.route('/oracle_vision/<symbol>')
+@cache.cached(timeout=300)
+def get_oracle_vision(symbol):
+    """Oracle vision insights for specific symbol"""
+    try:
+        symbol = symbol.upper()
+        vision_data = oracle_service.generate_insight(symbol)
+        return jsonify({
+            'symbol': symbol,
+            'vision': vision_data,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        logging.error(f"Oracle vision error: {str(e)}")
+        return jsonify({'error': f'Oracle vision failed: {str(e)}'}), 500
+
+@api_bp.route('/oracle_dreams')
+@cache.cached(timeout=600)
+def get_oracle_dreams():
+    """Oracle dreams - mystical market insights"""
+    try:
+        dreams_data = oracle_service.generate_insight('MARKET')
+        return jsonify({
+            'dreams': dreams_data,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        logging.error(f"Oracle dreams error: {str(e)}")
+        return jsonify({'error': f'Oracle dreams failed: {str(e)}'}), 500
+
+@api_bp.route('/portfolio/<symbol>')
+@cache.cached(timeout=300)
+def get_portfolio_analysis(symbol):
+    """Portfolio analysis for symbol"""
+    try:
+        symbol = symbol.upper()
+        portfolio_data = portfolio_manager.analyze_portfolio(symbol)
+        return jsonify({
+            'symbol': symbol,
+            'portfolio_analysis': portfolio_data,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        logging.error(f"Portfolio analysis error: {str(e)}")
+        return jsonify({'error': f'Portfolio analysis failed: {str(e)}'}), 500
+
+@api_bp.route('/model_status')
+@cache.cached(timeout=60)
+def get_model_status():
+    """Model health and status monitoring"""
+    try:
+        status_data = health_monitor.get_health_status()
+        return jsonify({
+            'model_status': status_data,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        logging.error(f"Model status error: {str(e)}")
+        return jsonify({'error': f'Model status check failed: {str(e)}'}), 500
+
+@api_bp.route('/curiosity/<symbol>')
+@cache.cached(timeout=300)  
+def get_curiosity_analysis(symbol):
+    """Curiosity engine anomaly detection"""
+    try:
+        symbol = symbol.upper()
+        curiosity_data = curiosity_engine.analyze_anomalies(symbol)
+        return jsonify({
+            'symbol': symbol,
+            'curiosity_analysis': curiosity_data,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        logging.error(f"Curiosity analysis error: {str(e)}")
+        return jsonify({'error': f'Curiosity analysis failed: {str(e)}'}), 500
