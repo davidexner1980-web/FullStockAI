@@ -18,14 +18,16 @@ function initializeWebSocket() {
             transports: ['websocket', 'polling'],
             upgrade: true,
             forceNew: false,
-            timeout: 10000,
+            timeout: 20000,
             reconnection: true,
             reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            reconnectionAttempts: 10,
-            maxReconnectionAttempts: 10,
-            pingTimeout: 60000,
-            pingInterval: 25000
+            reconnectionDelayMax: 3000,
+            reconnectionAttempts: 20,
+            maxReconnectionAttempts: 20,
+            pingTimeout: 30000,
+            pingInterval: 15000,
+            autoConnect: true,
+            rememberUpgrade: true
         });
         
         setupSocketEventListeners();

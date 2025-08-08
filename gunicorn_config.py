@@ -8,9 +8,9 @@ backlog = 512
 # Worker processes  
 workers = 1  # Flask-SocketIO requires exactly 1 worker
 worker_class = "eventlet"  # Use eventlet for WebSocket support
-worker_connections = 100
-timeout = 60  # Increased timeout for SocketIO
-keepalive = 5
+worker_connections = 1000
+timeout = 120  # Increased timeout for SocketIO
+keepalive = 2
 
 # Restart workers - reduced to prevent socket issues
 max_requests = 500
@@ -32,5 +32,12 @@ limit_request_fields = 100
 limit_request_field_size = 8190
 
 # SocketIO specific settings
-graceful_timeout = 10
+graceful_timeout = 30
 worker_tmp_dir = "/dev/shm"
+
+# Additional WebSocket optimizations
+max_requests_jitter = 50
+worker_class_args = {
+    'path': '/socket.io/',
+    'resource': 'socket.io'
+}
