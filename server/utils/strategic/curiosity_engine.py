@@ -147,7 +147,7 @@ class CuriosityEngine:
             scaled_features = self.scaler.fit_transform(features)
             
             # Apply Isolation Forest
-            iso_forest = IsolationForest(contamination=0.1, random_state=42)
+            iso_forest = IsolationForest(contamination='auto', random_state=42)
             anomaly_labels = iso_forest.fit_predict(scaled_features)
             anomaly_scores = iso_forest.score_samples(scaled_features)
             
