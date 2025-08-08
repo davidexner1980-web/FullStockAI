@@ -46,18 +46,10 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 
 # Initialize extensions
 db.init_app(app)
-socketio.init_app(app, 
-                 cors_allowed_origins="*",
-                 logger=False,
-                 engineio_logger=False,
-                 async_mode='threading',
-                 transports=['websocket', 'polling'],
-                 ping_timeout=30,
-                 ping_interval=15,
-                 always_connect=True,
-                 reconnection=True,
-                 reconnection_delay=1,
-                 max_reconnection_attempts=10)
+# Temporarily disable complex WebSocket setup for stability
+# socketio.init_app(app, cors_allowed_origins="*")
+# Basic setup for now
+pass  # Disable SocketIO temporarily to fix API functionality
 cache.init_app(app)
 mail.init_app(app)
 
