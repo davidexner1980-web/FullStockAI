@@ -260,12 +260,124 @@ def health_check():
 def handle_connect():
     """Handle WebSocket connection"""
     logging.info('Client connected to WebSocket')
-    emit('connected', {'status': 'Connected to FullStock AI'})
+    emit('connected', {'status': 'Connected to FullStock AI', 'timestamp': datetime.utcnow().isoformat()})
 
 @socketio.on('disconnect') 
 def handle_disconnect():
     """Handle WebSocket disconnection"""
     logging.info('Client disconnected from WebSocket')
+
+@socketio.on('subscribe_ticker')
+def handle_subscribe_ticker(data):
+    """Handle ticker subscription request"""
+    try:
+        ticker = data.get('ticker', 'SPY').upper()
+        logging.info(f'Client subscribed to {ticker}')
+        
+        # Get current data and emit price update
+        stock_data = data_fetcher.get_stock_data(ticker, period='1d')
+        if stock_data is not None and not stock_data.empty:
+            current_price = float(stock_data['Close'].iloc[-1])
+            emit('price_update', {
+                'ticker': ticker,
+                'price': current_price,
+                'timestamp': datetime.utcnow().isoformat()
+            })
+    except Exception as e:
+        logging.error(f"Subscribe ticker error: {str(e)}")
+        ticker_name = data.get('ticker', 'unknown') if data else 'unknown'
+        emit('error', {'message': f'Failed to subscribe to {ticker_name}: {str(e)}'})
+
+@socketio.on('request_prediction')
+def handle_request_prediction(data):
+    """Handle prediction request via WebSocket"""
+    try:
+        ticker = data.get('ticker', 'SPY').upper()
+        logging.info(f'Prediction requested for {ticker} via WebSocket')
+        
+        # Get data and predictions
+        stock_data = data_fetcher.get_stock_data(ticker)
+        if stock_data is None or stock_data.empty:
+            emit('error', {'message': f'Failed to fetch data for {ticker}'})
+            return
+        
+        current_price = float(stock_data['Close'].iloc[-1])
+        
+        # Get predictions from all models
+        predictions = {}
+        successful_predictions = []
+        
+        try:
+            rf_prediction = ml_manager.predict_random_forest(stock_data)
+            if rf_prediction and 'prediction' in rf_prediction:
+                predictions['random_forest'] = rf_prediction
+                successful_predictions.append(rf_prediction['prediction'])
+        except Exception as e:
+            predictions['random_forest'] = {'error': f'Random Forest failed: {str(e)}'}
+        
+        try:
+            lstm_prediction = ml_manager.predict_lstm(stock_data)
+            if lstm_prediction and 'prediction' in lstm_prediction:
+                predictions['lstm'] = lstm_prediction
+                successful_predictions.append(lstm_prediction['prediction'])
+        except Exception as e:
+            predictions['lstm'] = {'error': f'LSTM failed: {str(e)}'}
+        
+        try:
+            xgb_prediction = ml_manager.predict_xgboost(stock_data)
+            if xgb_prediction and 'prediction' in xgb_prediction:
+                predictions['xgboost'] = xgb_prediction
+                successful_predictions.append(xgb_prediction['prediction'])
+        except Exception as e:
+            predictions['xgboost'] = {'error': f'XGBoost failed: {str(e)}'}
+        
+        # Calculate ensemble
+        if successful_predictions:
+            ensemble_prediction = sum(successful_predictions) / len(successful_predictions)
+            ensemble_confidence = min(0.95, len(successful_predictions) / 3.0 * 0.75)
+        else:
+            ensemble_prediction = current_price * 1.01
+            ensemble_confidence = 0.3
+        
+        predictions['ensemble'] = {
+            'prediction': ensemble_prediction,
+            'confidence': ensemble_confidence
+        }
+        
+        # Calculate agreement
+        if len(successful_predictions) >= 2:
+            max_pred = max(successful_predictions)
+            min_pred = min(successful_predictions)
+            agreement_level = 1.0 - (abs(max_pred - min_pred) / max_pred)
+        else:
+            agreement_level = 0.5
+        
+        response_data = {
+            'ticker': ticker,
+            'current_price': current_price,
+            'predictions': predictions,
+            'agreement_level': agreement_level,
+            'timestamp': datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S+00:00")
+        }
+        
+        emit('prediction_update', response_data)
+        
+    except Exception as e:
+        logging.error(f"Request prediction error: {str(e)}")
+        ticker_name = data.get('ticker', 'unknown') if data else 'unknown'
+        emit('error', {'message': f'Failed to get prediction for {ticker_name}: {str(e)}'})
+
+@socketio.on('unsubscribe_ticker')
+def handle_unsubscribe_ticker(data):
+    """Handle ticker unsubscription request"""
+    try:
+        ticker = data.get('ticker', '').upper()
+        logging.info(f'Client unsubscribed from {ticker}')
+        emit('unsubscribed', {'ticker': ticker, 'status': 'Unsubscribed'})
+    except Exception as e:
+        logging.error(f"Unsubscribe ticker error: {str(e)}")
+        ticker_name = data.get('ticker', 'unknown') if data else 'unknown'
+        emit('error', {'message': f'Failed to unsubscribe from {ticker_name}: {str(e)}'})
 
 @socketio.on('request_live_data')
 def handle_live_data_request(data):
@@ -285,4 +397,5 @@ def handle_live_data_request(data):
             })
     except Exception as e:
         logging.error(f"Live data request error: {str(e)}")
-        emit('error', {'message': f'Failed to get live data: {str(e)}'})
+        ticker_name = data.get('ticker', 'unknown') if data else 'unknown'
+        emit('error', {'message': f'Failed to get live data for {ticker_name}: {str(e)}'})
