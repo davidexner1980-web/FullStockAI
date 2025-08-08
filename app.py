@@ -46,14 +46,15 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 
 # Initialize extensions
 db.init_app(app)
-# Initialize SocketIO with proper configuration
-socketio.init_app(app, cors_allowed_origins="*", async_mode='threading')
+# Initialize SocketIO with eventlet for WebSocket support
+socketio.init_app(app, cors_allowed_origins="*", async_mode='eventlet', logger=True, engineio_logger=True)
 cache.init_app(app)
 mail.init_app(app)
 
-# Background scheduler for periodic tasks
+# Background scheduler for periodic tasks - eventlet compatible
 scheduler = BackgroundScheduler(daemon=True)
-scheduler.start()
+if not scheduler.running:
+    scheduler.start()
 atexit.register(lambda: scheduler.shutdown() if scheduler.running else None)
 
 with app.app_context():

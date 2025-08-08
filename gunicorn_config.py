@@ -5,17 +5,17 @@ import multiprocessing
 bind = "0.0.0.0:5000"
 backlog = 512
 
-# Worker processes  
-workers = 1  # Single worker for stability
-worker_class = "sync"  # Use sync worker for stability
+# Worker processes optimized for Flask-SocketIO
+workers = 1  # Single worker required for SocketIO
+worker_class = "eventlet"  # Required for WebSocket support
 worker_connections = 1000
-timeout = 30  # Standard timeout
-keepalive = 2
+timeout = 120  # Extended timeout for WebSocket connections
+keepalive = 5
 
-# Restart workers
-max_requests = 1000
-max_requests_jitter = 50
-preload_app = True  # Enable preloading for performance
+# Restart workers - adjusted for SocketIO stability
+max_requests = 0  # Disable auto-restart for WebSocket stability
+max_requests_jitter = 0
+preload_app = False  # Disable preloading for SocketIO compatibility
 
 # Logging
 loglevel = "info"
@@ -31,5 +31,8 @@ limit_request_line = 4094
 limit_request_fields = 100
 limit_request_field_size = 8190
 
-# Standard settings
-graceful_timeout = 30
+# Extended settings for WebSocket stability
+graceful_timeout = 120
+user = None
+group = None
+tmp_upload_dir = None
