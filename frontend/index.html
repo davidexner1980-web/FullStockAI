@@ -297,17 +297,31 @@
     <script src="/static/js/dashboard.js"></script>
     
     <script>
+        // Global escape function for stuck loading
+        window.forceReset = function() {
+            console.log('🔄 Force reset triggered by user');
+            if (typeof forceHideLoading === 'function') {
+                forceHideLoading();
+            }
+            // Reset any stuck states
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+                loadingOverlay.style.visibility = 'hidden';
+            }
+            console.log('✅ Reset complete - try analyzing again');
+        };
+        
         // Initialize Feather Icons
         feather.replace();
         
         // Initialize Dashboard
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded, initializing dashboard...');
             initializeDashboard();
             
-            // Auto-analyze SPY on load
-            setTimeout(() => {
-                analyzeStock('SPY');
-            }, 1000);
+            // Don't auto-analyze on load - let user trigger it manually
+            console.log('💡 Tip: If stuck on loading, run forceReset() in console');
         });
     </script>
 </body>

@@ -12,6 +12,9 @@ let isAnalyzing = false;
 function initializeDashboard() {
     console.log('FullStock AI vNext Ultimate initialized');
     
+    // Force hide any existing loading overlay
+    forceHideLoading();
+    
     // Setup event listeners
     setupEventListeners();
     
@@ -26,6 +29,35 @@ function initializeDashboard() {
     }
     
     console.log('Dashboard initialized successfully');
+}
+
+/**
+ * Force hide loading overlay - failsafe function
+ */
+function forceHideLoading() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+        loadingOverlay.style.visibility = 'hidden';
+        console.log('Loading overlay force hidden');
+    }
+    
+    // Clear any stuck intervals
+    if (window.loadingInterval) {
+        clearInterval(window.loadingInterval);
+        window.loadingInterval = null;
+    }
+    
+    // Reset analyze button
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const analyzeText = document.getElementById('analyzeText');
+    if (analyzeBtn) analyzeBtn.disabled = false;
+    if (analyzeText) analyzeText.textContent = 'Analyze';
+    
+    // Reset analyzing flag
+    isAnalyzing = false;
+    
+    console.log('Force loading reset complete');
 }
 
 /**
@@ -113,14 +145,21 @@ async function analyzeStock(ticker) {
         
         // Show sections
         showResultSections();
+        console.log('Result sections shown, analysis complete');
         
     } catch (error) {
         console.error('Analysis error:', error);
         showError(`Failed to analyze ${ticker}: ${error.message}`);
         updateLiveUpdates(`❌ Error analyzing ${ticker}: ${error.message}`);
     } finally {
+        console.log('Analysis completed, hiding loading state...');
+        // Force hide loading immediately
         hideLoadingState();
-        isAnalyzing = false;
+        // Also try after a short delay as backup
+        setTimeout(() => {
+            hideLoadingState();
+            console.log('Analysis fully completed with backup hide');
+        }, 500);
     }
 }
 
@@ -235,13 +274,23 @@ function showResultSections() {
 }
 
 function showLoadingState() {
+    console.log('Showing loading state...');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
     const loadingOverlay = document.getElementById('loadingOverlay');
     
-    analyzeBtn.disabled = true;
-    analyzeText.textContent = 'Analyzing...';
-    loadingOverlay.style.display = 'flex';
+    if (analyzeBtn) {
+        analyzeBtn.disabled = true;
+        console.log('Analyze button disabled');
+    }
+    if (analyzeText) {
+        analyzeText.textContent = 'Analyzing...';
+        console.log('Analyze text updated');
+    }
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+        console.log('Loading overlay shown');
+    }
     
     // Update loading text periodically
     const messages = [
@@ -261,17 +310,35 @@ function showLoadingState() {
 }
 
 function hideLoadingState() {
+    console.log('Hiding loading state...');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
     const loadingOverlay = document.getElementById('loadingOverlay');
     
-    analyzeBtn.disabled = false;
-    analyzeText.textContent = 'Analyze';
-    loadingOverlay.style.display = 'none';
+    if (analyzeBtn) {
+        analyzeBtn.disabled = false;
+        console.log('Analyze button enabled');
+    }
+    if (analyzeText) {
+        analyzeText.textContent = 'Analyze';
+        console.log('Analyze text reset');
+    }
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+        loadingOverlay.style.visibility = 'hidden'; // Extra enforcement
+        console.log('Loading overlay hidden');
+    }
     
     if (window.loadingInterval) {
         clearInterval(window.loadingInterval);
+        window.loadingInterval = null;
+        console.log('Loading interval cleared');
     }
+    
+    // Force flag reset
+    isAnalyzing = false;
+    
+    console.log('Loading state hidden successfully');
 }
 
 /**
