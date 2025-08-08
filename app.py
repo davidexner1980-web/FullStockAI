@@ -21,7 +21,7 @@ socketio = SocketIO()
 cache = Cache()
 mail = Mail()
 
-# Create the app with new frontend directory structure  
+# Create the app with proper frontend/static separation
 app = Flask(__name__, 
            template_folder='frontend',
            static_folder='frontend')
@@ -102,5 +102,12 @@ scheduler.add_job(
     minutes=60,
     id='health_check'
 )
+
+# Add static file route for proper frontend asset serving
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    """Serve static files from frontend directory"""
+    from flask import send_from_directory
+    return send_from_directory('frontend', filename)
 
 # Routes are handled by server/api blueprints
