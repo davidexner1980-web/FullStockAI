@@ -49,14 +49,18 @@ db.init_app(app)
 socketio.init_app(app, 
                  cors_allowed_origins="*",
                  logger=True,
-                 engineio_logger=False)
+                 engineio_logger=False,
+                 async_mode='threading',
+                 transports=['polling', 'websocket'],
+                 ping_timeout=60,
+                 ping_interval=25)
 cache.init_app(app)
 mail.init_app(app)
 
 # Background scheduler for periodic tasks
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(daemon=True)
 scheduler.start()
-atexit.register(lambda: scheduler.shutdown())
+atexit.register(lambda: scheduler.shutdown() if scheduler.running else None)
 
 with app.app_context():
     # Import models to ensure tables are created
