@@ -54,8 +54,10 @@ function forceHideLoading() {
     // Reset analyze button
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     if (analyzeBtn) analyzeBtn.disabled = false;
     if (analyzeText) analyzeText.textContent = 'Analyze';
+    if (analyzeSpinner) analyzeSpinner.style.display = 'none';
     
     // Reset analyzing flag
     isAnalyzing = false;
@@ -300,6 +302,7 @@ function showLoadingState() {
     console.log('Showing loading state...');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     const loadingOverlay = document.getElementById('loadingOverlay');
     
     if (analyzeBtn) {
@@ -309,6 +312,10 @@ function showLoadingState() {
     if (analyzeText) {
         analyzeText.textContent = 'Analyzing...';
         console.log('Analyze text updated');
+    }
+    if (analyzeSpinner) {
+        analyzeSpinner.style.display = 'inline-block';
+        console.log('Analyze spinner shown');
     }
     if (loadingOverlay) {
         loadingOverlay.style.display = 'flex';
@@ -336,6 +343,7 @@ function hideLoadingState() {
     console.log('Hiding loading state...');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     const loadingOverlay = document.getElementById('loadingOverlay');
     
     if (analyzeBtn) {
@@ -345,6 +353,10 @@ function hideLoadingState() {
     if (analyzeText) {
         analyzeText.textContent = 'Analyze';
         console.log('Analyze text reset');
+    }
+    if (analyzeSpinner) {
+        analyzeSpinner.style.display = 'none';
+        console.log('Analyze spinner hidden');
     }
     if (loadingOverlay) {
         loadingOverlay.style.display = 'none';
