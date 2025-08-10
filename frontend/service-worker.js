@@ -27,8 +27,7 @@ const STATIC_ASSETS = [
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
     'https://unpkg.com/feather-icons',
-    'https://cdn.jsdelivr.net/npm/chart.js',
-    'https://cdn.socket.io/4.7.2/socket.io.min.js'
+    'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
 // API endpoints to cache (with short TTL)
@@ -125,7 +124,7 @@ self.addEventListener('fetch', (event) => {
     }
     
     // Skip WebSocket requests
-    if (url.pathname.includes('socket.io')) {
+    if (url.pathname.startsWith('/ws/')) {
         return;
     }
     

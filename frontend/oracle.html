@@ -19,8 +19,6 @@
     <!-- Feather Icons -->
     <script src="https://unpkg.com/feather-icons"></script>
     
-    <!-- Socket.IO -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -67,6 +65,10 @@
             </div>
         </div>
     </nav>
+
+    <div id="wsWarning" class="alert alert-warning text-center mb-0" role="alert" style="display:none;">
+        Real-time connection lost. Using fallback mode.
+    </div>
 
     <!-- Oracle Dashboard -->
     <div class="container-fluid py-4">
