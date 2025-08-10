@@ -3,7 +3,11 @@ import pandas as pd
 import numpy as np
 import logging
 from datetime import datetime, timedelta
-import talib
+try:
+    import talib
+except ImportError:
+    talib = None
+    logging.warning("TA-Lib not installed; technical indicators will be limited.")
 import requests
 from app import cache
 
@@ -62,6 +66,9 @@ class DataFetcher:
     
     def _add_technical_indicators(self, data):
         """Add comprehensive technical indicators"""
+        if talib is None:
+            logging.warning('TA-Lib not available. Skipping technical indicators.')
+            return data
         try:
             close = data['Close'].values
             high = data['High'].values
