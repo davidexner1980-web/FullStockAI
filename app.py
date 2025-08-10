@@ -1,7 +1,6 @@
 import os
 import logging
 import json
-import time
 from datetime import datetime
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -128,6 +127,6 @@ def quotes(ws):
             'timestamp': datetime.utcnow().isoformat()
         }
         ws.send(json.dumps(data))
-        time.sleep(1)
+        socketio.sleep(1)
 
 # Routes are handled by server/api blueprints
