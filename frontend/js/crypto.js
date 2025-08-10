@@ -6,13 +6,18 @@
 let currentCrypto = 'BTC-USD';
 let cryptoChart = null;
 let isAnalyzingCrypto = false;
+const CRYPTO_PATTERN = /^[A-Z.-]{1,10}$/;
 
 /**
  * Initialize Crypto Dashboard
  */
 function initializeCryptoDashboard() {
     console.log('Crypto Dashboard initialized');
-    
+
+    // Ensure analyze spinner is hidden initially
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
+    if (analyzeSpinner) analyzeSpinner.style.display = 'none';
+
     // Setup event listeners
     setupCryptoEventListeners();
     
@@ -54,6 +59,10 @@ function setupCryptoEventListeners() {
                 }
             }
         });
+
+        cryptoInput.addEventListener('input', () => {
+            clearInputError();
+        });
     }
 
     // Quick crypto buttons
@@ -61,6 +70,7 @@ function setupCryptoEventListeners() {
         btn.addEventListener('click', () => {
             const crypto = btn.getAttribute('data-crypto');
             cryptoInput.value = crypto;
+            clearInputError();
             analyzeCrypto(crypto);
         });
     });
@@ -85,6 +95,13 @@ function setupCryptoEventListeners() {
  * Analyze Cryptocurrency - Main Function
  */
 async function analyzeCrypto(crypto) {
+    if (!CRYPTO_PATTERN.test(crypto)) {
+        displayInputError('Please enter a valid crypto symbol (1-10 uppercase letters, dots or hyphens).');
+        return;
+    }
+
+    clearInputError();
+
     if (isAnalyzingCrypto) return;
     
     console.log(`Analyzing crypto ${crypto}...`);
@@ -465,26 +482,48 @@ function showCryptoResultSections() {
 function showCryptoLoadingState() {
     const analyzeBtn = document.getElementById('analyzeCryptoBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     const loadingOverlay = document.getElementById('loadingOverlay');
-    
+
     if (analyzeBtn) analyzeBtn.disabled = true;
     if (analyzeText) analyzeText.textContent = 'Analyzing...';
+    if (analyzeSpinner) analyzeSpinner.style.display = 'inline-block';
     if (loadingOverlay) loadingOverlay.style.display = 'flex';
 }
 
 function hideCryptoLoadingState() {
     const analyzeBtn = document.getElementById('analyzeCryptoBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     const loadingOverlay = document.getElementById('loadingOverlay');
-    
+
     if (analyzeBtn) analyzeBtn.disabled = false;
     if (analyzeText) analyzeText.textContent = 'Analyze';
+    if (analyzeSpinner) analyzeSpinner.style.display = 'none';
     if (loadingOverlay) loadingOverlay.style.display = 'none';
 }
 
+/**
+ * Input validation helpers
+ */
+function displayInputError(message) {
+    clearInputError();
+    const input = document.getElementById('cryptoInput');
+    if (!input) return;
+    const errorEl = document.createElement('div');
+    errorEl.id = 'cryptoError';
+    errorEl.className = 'text-danger mt-1';
+    errorEl.textContent = message;
+    input.parentElement.insertAdjacentElement('afterend', errorEl);
+}
+
+function clearInputError() {
+    const errorEl = document.getElementById('cryptoError');
+    if (errorEl) errorEl.remove();
+}
+
 function showCryptoError(message) {
-    console.error('Crypto error:', message);
-    // Could implement toast notification
+    createToast(message, 'error');
 }
 
 /**

@@ -26,50 +26,7 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <i data-feather="trending-up" class="me-2"></i>
-                FullStock AI vNext Ultimate
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">
-                            <i data-feather="home" class="me-1"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="crypto.html">
-                            <i data-feather="dollar-sign" class="me-1"></i>Crypto
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="oracle.html">
-                            <i data-feather="eye" class="me-1"></i>Oracle
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="portfolio.html">
-                            <i data-feather="briefcase" class="me-1"></i>Portfolio
-                        </a>
-                    </li>
-                </ul>
-                
-                <!-- Connection Status -->
-                <div class="navbar-text ms-3" id="connectionStatusContainer" role="status" aria-live="polite" aria-label="Connection status: Live">
-                    <span class="status-indicator status-online" id="connectionStatus"></span>
-                    <span id="connectionText">Live</span>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {% include 'partials/navbar.html' %}
 
     <!-- Portfolio Dashboard -->
     <div class="container-fluid py-4">
@@ -316,6 +273,8 @@
         </div>
     </div>
 
+    <div id="toastContainer" class="toast-container"></div>
+
     <!-- Loading Overlay -->
     <div id="portfolioLoadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.8); z-index: 9999; display: none;">
         <div class="text-center">
@@ -330,6 +289,7 @@
     
     <!-- Application Scripts -->
     <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
     
     <script>

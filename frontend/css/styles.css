@@ -423,3 +423,40 @@ body {
   justify-content: center;
   z-index: 1050;
 }
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: var(--fs-spacing-md);
+  right: var(--fs-spacing-md);
+  z-index: var(--fs-z-toast);
+}
+
+.toast {
+  background: var(--card-bg);
+  color: var(--fs-color-text);
+  padding: var(--fs-spacing-sm) var(--fs-spacing-md);
+  margin-bottom: var(--fs-spacing-sm);
+  border-radius: var(--fs-radius-md);
+  box-shadow: var(--fs-shadow-md);
+  opacity: 0;
+  transform: translateX(100%);
+  transition: var(--fs-transition-base);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast-success {
+  border-left: 4px solid var(--fs-color-success);
+}
+
+.toast-error {
+  border-left: 4px solid var(--fs-color-danger);
+}
+
+.toast-info {
+  border-left: 4px solid var(--fs-color-primary);
+}

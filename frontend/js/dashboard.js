@@ -5,6 +5,7 @@
 
 let currentTicker = 'SPY';
 let isAnalyzing = false;
+const TICKER_PATTERN = /^[A-Z.-]{1,10}$/;
 
 /**
  * Initialize Dashboard
@@ -54,8 +55,10 @@ function forceHideLoading() {
     // Reset analyze button
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     if (analyzeBtn) analyzeBtn.disabled = false;
     if (analyzeText) analyzeText.textContent = 'Analyze';
+    if (analyzeSpinner) analyzeSpinner.style.display = 'none';
     
     // Reset analyzing flag
     isAnalyzing = false;
@@ -90,11 +93,17 @@ function setupEventListeners() {
         }
     });
 
+    // Clear error on input change
+    tickerInput.addEventListener('input', () => {
+        clearInputError();
+    });
+
     // Quick ticker buttons
     quickTickers.forEach(btn => {
         btn.addEventListener('click', () => {
             const ticker = btn.getAttribute('data-ticker');
             tickerInput.value = ticker;
+            clearInputError();
             analyzeStock(ticker);
         });
     });
@@ -139,6 +148,13 @@ function setupScrollTopButton() {
  * Analyze Stock - Main Function
  */
 async function analyzeStock(ticker) {
+    if (!TICKER_PATTERN.test(ticker)) {
+        displayInputError('Please enter a valid stock symbol (1-10 uppercase letters, dots or hyphens).');
+        return;
+    }
+
+    clearInputError();
+
     if (isAnalyzing) return;
     
     console.log(`Analyzing ${ticker}...`);
@@ -300,6 +316,7 @@ function showLoadingState() {
     console.log('Showing loading state...');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     const loadingOverlay = document.getElementById('loadingOverlay');
     
     if (analyzeBtn) {
@@ -309,6 +326,10 @@ function showLoadingState() {
     if (analyzeText) {
         analyzeText.textContent = 'Analyzing...';
         console.log('Analyze text updated');
+    }
+    if (analyzeSpinner) {
+        analyzeSpinner.style.display = 'inline-block';
+        console.log('Analyze spinner shown');
     }
     if (loadingOverlay) {
         loadingOverlay.style.display = 'flex';
@@ -336,6 +357,7 @@ function hideLoadingState() {
     console.log('Hiding loading state...');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     const loadingOverlay = document.getElementById('loadingOverlay');
     
     if (analyzeBtn) {
@@ -345,6 +367,10 @@ function hideLoadingState() {
     if (analyzeText) {
         analyzeText.textContent = 'Analyze';
         console.log('Analyze text reset');
+    }
+    if (analyzeSpinner) {
+        analyzeSpinner.style.display = 'none';
+        console.log('Analyze spinner hidden');
     }
     if (loadingOverlay) {
         loadingOverlay.style.display = 'none';
@@ -365,11 +391,29 @@ function hideLoadingState() {
 }
 
 /**
+ * Input validation helpers
+ */
+function displayInputError(message) {
+    clearInputError();
+    const input = document.getElementById('tickerInput');
+    if (!input) return;
+    const errorEl = document.createElement('div');
+    errorEl.id = 'tickerError';
+    errorEl.className = 'text-danger mt-1';
+    errorEl.textContent = message;
+    input.parentElement.insertAdjacentElement('afterend', errorEl);
+}
+
+function clearInputError() {
+    const errorEl = document.getElementById('tickerError');
+    if (errorEl) errorEl.remove();
+}
+
+/**
  * Show Error Message
  */
 function showError(message) {
-    // You could implement a toast notification system here
-    console.error(message);
+    createToast(message, 'error');
 }
 
 /**
