@@ -1,4 +1,3 @@
-import json
 import threading
 import time
 import os
@@ -6,10 +5,13 @@ import sys
 import types
 import pathlib
 
-from websocket import create_connection
+import socketio
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
+sys.path.insert(0, str(ROOT))
+
+if 'app' in sys.modules:
+    del sys.modules['app']
 
 # Stub heavy modules to speed up imports
 sys.modules['yfinance'] = types.ModuleType('yfinance')
@@ -38,11 +40,11 @@ sys.modules['server.utils.strategic.health_monitor'] = mod_health
 sys.modules['server.utils.services.portfolio_manager'] = types.ModuleType('server.utils.services.portfolio_manager')
 sys.modules['server.utils.services.portfolio_manager'].PortfolioManager = object
 
-from app import app, socketio
+from app import app, socketio as server_socketio
 
 
 def _run_server():
-    socketio.run(app, host="127.0.0.1", port=8765, use_reloader=False)
+    server_socketio.run(app, host="127.0.0.1", port=8765, use_reloader=False)
 
 
 def test_ws_quotes():
@@ -50,8 +52,13 @@ def test_ws_quotes():
     server.start()
     time.sleep(1)
 
-    ws = create_connection("ws://127.0.0.1:8765/ws/quotes")
-    message = ws.recv()
-    data = json.loads(message)
-    assert "ticker" in data
-    ws.close()
+    client = socketio.Client()
+    received = {}
+
+    @client.on('quote', namespace='/ws/quotes')
+    def on_quote(data):
+        received.update(data)
+        client.disconnect()
+
+    client.connect('http://127.0.0.1:8765', namespaces=['/ws/quotes'])
+    assert "ticker" in received
