@@ -17,6 +17,9 @@ function initializeDashboard() {
     
     // Setup event listeners
     setupEventListeners();
+
+    // Scroll to top button
+    setupScrollTopButton();
     
     // Initialize WebSocket connection
     if (typeof initializeWebSocket === 'function') {
@@ -102,13 +105,33 @@ function setupEventListeners() {
             // Update active state
             timeframeBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
             // Refresh chart with new timeframe
             const period = btn.getAttribute('data-period');
             if (currentTicker) {
                 loadChartData(currentTicker, period);
             }
         });
+    });
+}
+
+/**
+ * Setup Scroll to Top button
+ */
+function setupScrollTopButton() {
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    if (!scrollBtn) return;
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 200) {
+            scrollBtn.style.display = 'flex';
+        } else {
+            scrollBtn.style.display = 'none';
+        }
+    });
+
+    scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
 
