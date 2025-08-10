@@ -1,0 +1,6 @@
+{
+  "include": ["app.py", "server/api", "server/config.py"],
+  "exclude": ["server/utils"],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none"
+}

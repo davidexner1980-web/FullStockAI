@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from flask_caching import Cache
@@ -10,8 +10,12 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+from server.utils.logging import JsonFormatter
+
+# Configure structured logging
+handler = logging.StreamHandler()
+handler.setFormatter(JsonFormatter())
+logging.basicConfig(level=logging.INFO, handlers=[handler])
 
 class Base(DeclarativeBase):
     pass
@@ -59,7 +63,7 @@ atexit.register(lambda: scheduler.shutdown() if scheduler.running else None)
 
 with app.app_context():
     # Import models to ensure tables are created
-    import models
+    import models  # noqa: F401
     db.create_all()
     
     # Create necessary directories
@@ -69,15 +73,15 @@ with app.app_context():
     os.makedirs("static/icons", exist_ok=True)
 
 # Import and register blueprints
-from server.api.main import main_bp
-from server.api.api import api_bp
+from server.api.main import main_bp  # noqa: E402
+from server.api.api import api_bp  # noqa: E402
 
 app.register_blueprint(main_bp)
 app.register_blueprint(api_bp, url_prefix='/api')
 
 # Background tasks
-from server.utils.services.notification_service import check_price_alerts
-from server.utils.strategic.health_monitor import run_health_check
+from server.utils.services.notification_service import check_price_alerts  # noqa: E402
+from server.utils.strategic.health_monitor import run_health_check  # noqa: E402
 
 # Schedule periodic tasks
 scheduler.add_job(
@@ -93,6 +97,14 @@ scheduler.add_job(
     minutes=60,
     id='health_check'
 )
+
+
+# Consistent JSON error responses
+@app.errorhandler(Exception)
+def handle_exception(err):
+    code = getattr(err, "code", 500)
+    response = {"error": type(err).__name__, "message": str(err)}
+    return jsonify(response), code
 
 # Add static file route for proper frontend asset serving
 @app.route('/static/<path:filename>')
