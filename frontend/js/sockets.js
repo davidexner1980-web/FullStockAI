@@ -39,8 +39,8 @@ function connect(url) {
         try {
             const data = JSON.parse(event.data);
             console.log('WebSocket message received', data);
-            if (data.ticker && typeof updateLiveUpdates === 'function') {
-                updateLiveUpdates(`📈 ${data.ticker} update`);
+            if (data.ticker && typeof window.updateLiveUpdates === 'function') {
+                window.updateLiveUpdates(`📈 ${data.ticker} update`);
             }
             hideWsWarning();
         } catch (err) {
