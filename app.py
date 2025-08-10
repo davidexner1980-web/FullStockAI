@@ -1,6 +1,5 @@
 import os
 import logging
-import json
 from datetime import datetime
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -127,6 +126,8 @@ def quotes(ws):
         'prediction': 'hold',
         'timestamp': datetime.utcnow().isoformat()
     }
+    import json
+
     ws.send(json.dumps(initial_data))
     while True:
         message = ws.receive()
