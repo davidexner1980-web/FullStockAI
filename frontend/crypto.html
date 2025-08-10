@@ -23,11 +23,13 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Socket.IO -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     {% include 'partials/navbar.html' %}
+
+    <div id="wsWarning" class="alert alert-warning text-center mb-0" role="alert" style="display:none;">
+        Real-time connection lost. Using fallback mode.
+    </div>
 
     <!-- Crypto Dashboard -->
     <div class="container-fluid py-4">

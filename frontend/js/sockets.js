@@ -1,399 +1,104 @@
 /**
- * FullStock AI WebSocket Client - Real-time Data Streaming
- * Handles live price updates, predictions, and system notifications
+ * Lightweight WebSocket client for FullStock AI
+ * Handles connection, logging and reconnection with backoff
  */
 
-let socket = null;
-let connectionRetryCount = 0;
-const maxRetryAttempts = 5;
-let reconnectInterval = null;
+let ws = null;
+let reconnectAttempts = 0;
+let warningTimer = null;
+const MAX_BACKOFF = 30000; // 30s
 
-/**
- * Initialize WebSocket Connection
- */
 function initializeWebSocket() {
-    try {
-        // Connect to Socket.IO server with optimized transport settings
-        socket = io({
-            transports: ['websocket', 'polling'],
-            upgrade: true,
-            forceNew: false,
-            timeout: 20000,
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 3000,
-            reconnectionAttempts: 20,
-            maxReconnectionAttempts: 20,
-            pingTimeout: 30000,
-            pingInterval: 15000,
-            autoConnect: true,
-            rememberUpgrade: true
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    const url = `${proto}://${location.host}/ws/quotes`;
+    connect(url);
+}
+
+function connect(url) {
+    ws = new WebSocket(url);
+    console.log('Attempting WebSocket connection to', url);
+
+    // Warn user if connection not established in 5s
+    warningTimer = setTimeout(() => {
+        showWsWarning();
+        if (typeof forceReset === 'function') {
+            forceReset();
+        }
+    }, 5000);
+
+    ws.onopen = () => {
+        console.log('WebSocket opened', { readyState: ws.readyState });
+        reconnectAttempts = 0;
+        clearTimeout(warningTimer);
+        hideWsWarning();
+    };
+
+    ws.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            console.log('WebSocket message received', data);
+            if (data.ticker && typeof updateLiveUpdates === 'function') {
+                updateLiveUpdates(`📈 ${data.ticker} update`);
+            }
+            hideWsWarning();
+        } catch (err) {
+            console.error('Error parsing WebSocket message', err);
+        }
+    };
+
+    ws.onerror = (event) => {
+        console.error('WebSocket error', { readyState: ws.readyState, event });
+    };
+
+    ws.onclose = (event) => {
+        console.warn('WebSocket closed', {
+            readyState: ws.readyState,
+            code: event.code,
+            reason: event.reason
         });
-        
-        setupSocketEventListeners();
-        console.log('WebSocket connection initiated');
-        
-    } catch (error) {
-        console.error('WebSocket initialization error:', error);
-        updateConnectionStatus('warning', 'HTTP Mode');
-        // Gracefully degrade to HTTP-only mode
-        fallbackToHttpMode();
+        scheduleReconnect(url);
+    };
+}
+
+function scheduleReconnect(url) {
+    reconnectAttempts += 1;
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts - 1), MAX_BACKOFF);
+    console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts})`);
+    setTimeout(() => connect(url), delay);
+    if (typeof forceReset === 'function') {
+        forceReset();
     }
 }
 
-/**
- * Setup Socket Event Listeners
- */
-function setupSocketEventListeners() {
-    // Connection established
-    socket.on('connect', () => {
-        console.log('WebSocket connected');
-        connectionRetryCount = 0;
-        updateConnectionStatus('online', 'Live');
-        
-        if (reconnectInterval) {
-            clearInterval(reconnectInterval);
-            reconnectInterval = null;
-        }
-        
-        // Request initial data if ticker is set
-        if (window.currentTicker) {
-            requestLiveData(window.currentTicker);
-        }
-        
-        // Update live feed
-        if (typeof updateLiveUpdates === 'function') {
-            updateLiveUpdates('🟢 Connected to live data stream');
-        }
-    });
-    
-    // Connection lost
-    socket.on('disconnect', (reason) => {
-        console.log('WebSocket disconnected:', reason);
-        updateConnectionStatus('warning', 'Reconnecting...');
-        
-        if (typeof updateLiveUpdates === 'function') {
-            updateLiveUpdates('🟡 Connection lost, attempting to reconnect...');
-        }
-        
-        // Auto-reconnect logic
-        if (reason === 'io server disconnect') {
-            // Server initiated disconnect, reconnect manually
-            setTimeout(() => socket.connect(), 2000);
-        }
-    });
-    
-    // Connection error
-    socket.on('connect_error', (error) => {
-        console.error('WebSocket connection error:', error);
-        connectionRetryCount++;
-        
-        if (connectionRetryCount <= maxRetryAttempts) {
-            updateConnectionStatus('warning', `Retry ${connectionRetryCount}/${maxRetryAttempts}`);
-            setTimeout(() => {
-                if (socket.disconnected) {
-                    socket.connect();
-                }
-            }, 3000 * connectionRetryCount);
-        } else {
-            updateConnectionStatus('error', 'Offline');
-            if (typeof updateLiveUpdates === 'function') {
-                updateLiveUpdates('🔴 Connection failed after multiple attempts');
-            }
-        }
-    });
-    
-    // Real-time price updates
-    socket.on('price_update', (data) => {
-        console.log('Received price update:', data);
-        handlePriceUpdate(data);
-    });
-    
-    // ML prediction updates
-    socket.on('prediction_update', (data) => {
-        console.log('Received prediction update:', data);
-        handlePredictionUpdate(data);
-    });
-    
-    // System notifications
-    socket.on('system_notification', (data) => {
-        console.log('System notification:', data);
-        handleSystemNotification(data);
-    });
-    
-    // Model status updates
-    socket.on('model_status', (data) => {
-        console.log('Model status update:', data);
-        handleModelStatusUpdate(data);
-    });
-    
-    // Oracle insights (if available)
-    socket.on('oracle_insight', (data) => {
-        console.log('Oracle insight received:', data);
-        handleOracleInsight(data);
-    });
-    
-    // Market alerts
-    socket.on('market_alert', (data) => {
-        console.log('Market alert:', data);
-        handleMarketAlert(data);
-    });
-}
-
-/**
- * Handle Real-time Price Updates
- */
-function handlePriceUpdate(data) {
-    if (data.ticker === window.currentTicker) {
-        // Update current price display
-        const priceElement = document.getElementById('currentPrice');
-        if (priceElement && data.price) {
-            priceElement.textContent = `$${data.price.toFixed(2)}`;
-            
-            // Add visual feedback for price changes
-            priceElement.classList.add('text-success');
-            setTimeout(() => {
-                priceElement.classList.remove('text-success');
-            }, 1000);
-        }
-        
-        // Update timestamp
-        const timestampElement = document.getElementById('priceTimestamp');
-        if (timestampElement) {
-            timestampElement.textContent = `Last updated: ${new Date().toLocaleString()}`;
-        }
-        
-        // Update live feed
-        if (typeof updateLiveUpdates === 'function') {
-            updateLiveUpdates(`📈 ${data.ticker}: $${data.price.toFixed(2)} ${data.change > 0 ? '↗️' : '↘️'}`);
-        }
+function showWsWarning() {
+    const banner = document.getElementById('wsWarning');
+    if (banner) {
+        banner.style.display = 'block';
     }
 }
 
-/**
- * Handle Prediction Updates
- */
-function handlePredictionUpdate(data) {
-    if (data.ticker === window.currentTicker) {
-        console.log('Updating predictions from WebSocket:', data);
-        
-        // Update prediction display if function exists
-        if (typeof updatePredictionDisplay === 'function') {
-            updatePredictionDisplay(data);
-        }
-        
-        // Update live feed
-        if (typeof updateLiveUpdates === 'function') {
-            const ensemblePrice = data.predictions?.ensemble?.prediction;
-            if (ensemblePrice) {
-                updateLiveUpdates(`🤖 New prediction for ${data.ticker}: $${ensemblePrice.toFixed(2)}`);
-            }
-        }
+function hideWsWarning() {
+    const banner = document.getElementById('wsWarning');
+    if (banner) {
+        banner.style.display = 'none';
     }
 }
 
-/**
- * Handle System Notifications
- */
-function handleSystemNotification(data) {
-    console.log('System notification:', data);
-    
-    // Update live feed
-    if (typeof updateLiveUpdates === 'function') {
-        const icon = data.type === 'error' ? '🔴' : data.type === 'warning' ? '🟡' : '🟢';
-        updateLiveUpdates(`${icon} ${data.message}`);
-    }
-    
-    // Show toast notification if available
-    if (typeof showNotification === 'function') {
-        showNotification(data.message, data.type);
-    }
-}
-
-/**
- * Handle Model Status Updates
- */
-function handleModelStatusUpdate(data) {
-    console.log('Model status update:', data);
-    
-    // Update model status indicators
-    const models = ['rf', 'lstm', 'xgb'];
-    models.forEach(model => {
-        const statusElement = document.getElementById(`${model}Status`);
-        if (statusElement && data[model]) {
-            statusElement.className = `status-indicator ${getStatusClass(data[model].status)}`;
-        }
-    });
-    
-    // Update live feed
-    if (typeof updateLiveUpdates === 'function') {
-        updateLiveUpdates(`⚙️ Model health check: ${data.healthy_models || 0}/3 models operational`);
-    }
-}
-
-/**
- * Handle Oracle Insights
- */
-function handleOracleInsight(data) {
-    console.log('Oracle insight:', data);
-    
-    // Update oracle panel if on oracle page
-    if (typeof updateOraclePanel === 'function') {
-        updateOraclePanel(data);
-    }
-    
-    // Update live feed
-    if (typeof updateLiveUpdates === 'function') {
-        updateLiveUpdates(`🔮 Oracle insight: ${data.symbol || 'Mystical guidance received'}`);
-    }
-}
-
-/**
- * Handle Market Alerts
- */
-function handleMarketAlert(data) {
-    console.log('Market alert:', data);
-    
-    // Update live feed with alert
-    if (typeof updateLiveUpdates === 'function') {
-        const alertIcon = data.severity === 'high' ? '🚨' : data.severity === 'medium' ? '⚠️' : 'ℹ️';
-        updateLiveUpdates(`${alertIcon} Alert: ${data.message}`);
-    }
-    
-    // Show prominent notification for high severity
-    if (data.severity === 'high' && typeof showNotification === 'function') {
-        showNotification(data.message, 'warning');
-    }
-}
-
-/**
- * Request Live Data for Ticker
- */
-function requestLiveData(ticker) {
-    if (socket && socket.connected) {
-        console.log(`Requesting live data for ${ticker}`);
-        socket.emit('subscribe_ticker', { ticker: ticker });
-        
-        // Request initial prediction update
-        socket.emit('request_prediction', { ticker: ticker });
-    }
-}
-
-/**
- * Unsubscribe from Ticker Updates
- */
-function unsubscribeTicker(ticker) {
-    if (socket && socket.connected) {
-        socket.emit('unsubscribe_ticker', { ticker: ticker });
-    }
-}
-
-/**
- * Update Connection Status UI
- */
-function updateConnectionStatus(status, text) {
-    const statusElement = document.getElementById('connectionStatus');
-    const textElement = document.getElementById('connectionText');
-    
-    if (statusElement) {
-        statusElement.className = `status-indicator ${getStatusClass(status)}`;
-    }
-    
-    if (textElement) {
-        textElement.textContent = text;
-    }
-}
-
-/**
- * Get Status CSS Class
- */
-function getStatusClass(status) {
-    switch (status) {
-        case 'online':
-        case 'healthy':
-        case 'operational':
-            return 'status-online';
-        case 'warning':
-        case 'degraded':
-            return 'status-warning';
-        case 'error':
-        case 'offline':
-        case 'failed':
-            return 'status-error';
-        default:
-            return 'status-warning';
-    }
-}
-
-/**
- * Send Custom Message
- */
-function sendSocketMessage(event, data) {
-    if (socket && socket.connected) {
-        socket.emit(event, data);
-        return true;
-    }
-    return false;
-}
-
-/**
- * Cleanup WebSocket Connection
- */
 function cleanupWebSocket() {
-    if (socket) {
-        socket.disconnect();
-        socket = null;
+    if (ws) {
+        ws.close();
+        ws = null;
     }
-    
-    if (reconnectInterval) {
-        clearInterval(reconnectInterval);
-        reconnectInterval = null;
-    }
-}
-
-/**
- * Fallback to HTTP-only mode when WebSocket fails
- */
-function fallbackToHttpMode() {
-    console.log('Falling back to HTTP-only mode');
-    updateConnectionStatus('warning', 'HTTP Only');
-    
-    // Disable socket-based features
-    socket = null;
-    
-    // Set up periodic HTTP polling for live updates
-    if (window.currentTicker) {
-        setInterval(() => {
-            fetchPredictionUpdate(window.currentTicker);
-        }, 30000); // Poll every 30 seconds
+    if (warningTimer) {
+        clearTimeout(warningTimer);
+        warningTimer = null;
     }
 }
 
-/**
- * Fetch prediction update via HTTP when WebSocket unavailable
- */
-async function fetchPredictionUpdate(ticker) {
-    try {
-        const response = await fetch(`/api/predict/${ticker}`);
-        const data = await response.json();
-        if (data && !data.error) {
-            handlePredictionUpdate(data);
-            if (typeof updateLiveUpdates === 'function') {
-                updateLiveUpdates(`📊 Updated ${ticker} via HTTP: $${data.current_price.toFixed(2)}`);
-            }
-        }
-    } catch (error) {
-        console.error('HTTP prediction update failed:', error);
-    }
-}
-
-// Export functions for global access
+// Export functions globally
 window.initializeWebSocket = initializeWebSocket;
-window.requestLiveData = requestLiveData;
-window.unsubscribeTicker = unsubscribeTicker;
-window.sendSocketMessage = sendSocketMessage;
 window.cleanupWebSocket = cleanupWebSocket;
-window.fallbackToHttpMode = fallbackToHttpMode;
 
-// Cleanup on page unload
+// Ensure cleanup on page unload
 window.addEventListener('beforeunload', cleanupWebSocket);
+
