@@ -12,7 +12,11 @@ let isAnalyzingCrypto = false;
  */
 function initializeCryptoDashboard() {
     console.log('Crypto Dashboard initialized');
-    
+
+    // Ensure analyze spinner is hidden initially
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
+    if (analyzeSpinner) analyzeSpinner.style.display = 'none';
+
     // Setup event listeners
     setupCryptoEventListeners();
     
@@ -465,20 +469,24 @@ function showCryptoResultSections() {
 function showCryptoLoadingState() {
     const analyzeBtn = document.getElementById('analyzeCryptoBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     const loadingOverlay = document.getElementById('loadingOverlay');
-    
+
     if (analyzeBtn) analyzeBtn.disabled = true;
     if (analyzeText) analyzeText.textContent = 'Analyzing...';
+    if (analyzeSpinner) analyzeSpinner.style.display = 'inline-block';
     if (loadingOverlay) loadingOverlay.style.display = 'flex';
 }
 
 function hideCryptoLoadingState() {
     const analyzeBtn = document.getElementById('analyzeCryptoBtn');
     const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
     const loadingOverlay = document.getElementById('loadingOverlay');
-    
+
     if (analyzeBtn) analyzeBtn.disabled = false;
     if (analyzeText) analyzeText.textContent = 'Analyze';
+    if (analyzeSpinner) analyzeSpinner.style.display = 'none';
     if (loadingOverlay) loadingOverlay.style.display = 'none';
 }
 
