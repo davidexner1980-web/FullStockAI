@@ -7,7 +7,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from flask_caching import Cache
 from flask_mail import Mail
-from flask_sock import Sock
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -27,7 +26,6 @@ db = SQLAlchemy(model_class=Base)
 socketio = SocketIO()
 cache = Cache()
 mail = Mail()
-sock = Sock()
 
 # Create the app with proper frontend/static separation
 app = Flask(__name__, 
@@ -58,7 +56,6 @@ db.init_app(app)
 socketio.init_app(app, cors_allowed_origins="*", async_mode='eventlet', logger=True, engineio_logger=True)
 cache.init_app(app)
 mail.init_app(app)
-sock.init_app(app)
 
 # Background scheduler for periodic tasks - eventlet compatible
 scheduler = BackgroundScheduler(daemon=True)
@@ -118,19 +115,21 @@ def static_files(filename):
     from flask import send_from_directory
     return send_from_directory('frontend', filename)
 
-# Simple WebSocket route for live quotes
-@sock.route('/ws/quotes')
-def quotes(ws):
+@socketio.on('connect', namespace='/ws/quotes')
+def quotes_connect():
     """Send basic quote updates to connected clients"""
     initial_data = {
         'ticker': 'SPY',
         'prediction': 'hold',
         'timestamp': datetime.utcnow().isoformat()
     }
-    ws.send(json.dumps(initial_data))
-    while True:
-        message = ws.receive()
-        if message is None:
-            break
+    socketio.emit('quote', initial_data, namespace='/ws/quotes')
+
+
+@socketio.on('message', namespace='/ws/quotes')
+def quotes_message(_):
+    """Handle incoming messages for the quotes namespace."""
+    # No-op: keep the connection alive
+    pass
 
 # Routes are handled by server/api blueprints
