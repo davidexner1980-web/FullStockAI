@@ -1,12 +1,14 @@
 import os
 import logging
 import json
+import time
 from datetime import datetime
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from flask_caching import Cache
 from flask_mail import Mail
+from flask_sock import Sock
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -26,6 +28,7 @@ db = SQLAlchemy(model_class=Base)
 socketio = SocketIO()
 cache = Cache()
 mail = Mail()
+sock = Sock()
 
 # Create the app with proper frontend/static separation
 app = Flask(__name__, 
@@ -52,12 +55,13 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 
 # Initialize extensions
 db.init_app(app)
-# Initialize SocketIO with eventlet for WebSocket support
-socketio.init_app(app, cors_allowed_origins="*", async_mode='eventlet', logger=True, engineio_logger=True)
+# Initialize SocketIO with gevent for WebSocket support
+socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', logger=True, engineio_logger=True)
 cache.init_app(app)
 mail.init_app(app)
+sock.init_app(app)
 
-# Background scheduler for periodic tasks - eventlet compatible
+# Background scheduler for periodic tasks - gevent compatible
 scheduler = BackgroundScheduler(daemon=True)
 if not scheduler.running:
     scheduler.start()
@@ -115,21 +119,15 @@ def static_files(filename):
     from flask import send_from_directory
     return send_from_directory('frontend', filename)
 
-@socketio.on('connect', namespace='/ws/quotes')
-def quotes_connect():
-    """Send basic quote updates to connected clients"""
-    initial_data = {
-        'ticker': 'SPY',
-        'prediction': 'hold',
-        'timestamp': datetime.utcnow().isoformat()
-    }
-    socketio.emit('quote', initial_data, namespace='/ws/quotes')
-
-
-@socketio.on('message', namespace='/ws/quotes')
-def quotes_message(_):
-    """Handle incoming messages for the quotes namespace."""
-    # No-op: keep the connection alive
-    pass
+@sock.route('/ws/quotes')
+def quotes(ws):
+    """Stream basic quote updates over plain WebSocket"""
+    while True:
+        data = {
+            'ticker': 'SPY',
+            'timestamp': datetime.utcnow().isoformat()
+        }
+        ws.send(json.dumps(data))
+        time.sleep(1)
 
 # Routes are handled by server/api blueprints

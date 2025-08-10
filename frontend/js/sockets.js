@@ -8,29 +8,31 @@ let reconnectAttempts = 0;
 let warningTimer = null;
 const MAX_BACKOFF = 30000; // 30s
 
+// Build WS URL from current page origin
+const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+const WS_URL = `${proto}://${location.host}/ws/quotes`;
+
 function initializeWebSocket() {
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    const url = `${proto}://${location.host}/ws/quotes`;
-    connect(url);
+    connect(WS_URL);
 }
 
 function connect(url) {
     ws = new WebSocket(url);
-    console.log('Attempting WebSocket connection to', url);
+    console.log(`Attempting WebSocket connection to ${url} (attempt ${reconnectAttempts + 1})`);
 
     // Warn user if connection not established in 5s
     warningTimer = setTimeout(() => {
         showWsWarning();
-        if (typeof forceReset === 'function') {
-            forceReset();
-        }
     }, 5000);
 
     ws.onopen = () => {
-        console.log('WebSocket opened', { readyState: ws.readyState });
+        console.log('WebSocket opened', { url, readyState: ws.readyState });
         reconnectAttempts = 0;
         clearTimeout(warningTimer);
         hideWsWarning();
+        if (typeof hideLoadingState === 'function') {
+            hideLoadingState();
+        }
     };
 
     ws.onmessage = (event) => {
@@ -47,15 +49,17 @@ function connect(url) {
     };
 
     ws.onerror = (event) => {
-        console.error('WebSocket error', { readyState: ws.readyState, event });
+        console.error('WebSocket error', { url, readyState: ws.readyState, event });
     };
 
     ws.onclose = (event) => {
         console.warn('WebSocket closed', {
+            url,
             readyState: ws.readyState,
             code: event.code,
             reason: event.reason
         });
+        clearTimeout(warningTimer);
         scheduleReconnect(url);
     };
 }
@@ -74,6 +78,9 @@ function showWsWarning() {
     const banner = document.getElementById('wsWarning');
     if (banner) {
         banner.style.display = 'block';
+    }
+    if (typeof hideLoadingState === 'function') {
+        hideLoadingState();
     }
 }
 
