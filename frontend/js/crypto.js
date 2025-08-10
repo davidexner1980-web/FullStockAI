@@ -6,6 +6,7 @@
 let currentCrypto = 'BTC-USD';
 let cryptoChart = null;
 let isAnalyzingCrypto = false;
+const CRYPTO_PATTERN = /^[A-Z.-]{1,10}$/;
 
 /**
  * Initialize Crypto Dashboard
@@ -54,6 +55,10 @@ function setupCryptoEventListeners() {
                 }
             }
         });
+
+        cryptoInput.addEventListener('input', () => {
+            clearInputError();
+        });
     }
 
     // Quick crypto buttons
@@ -61,6 +66,7 @@ function setupCryptoEventListeners() {
         btn.addEventListener('click', () => {
             const crypto = btn.getAttribute('data-crypto');
             cryptoInput.value = crypto;
+            clearInputError();
             analyzeCrypto(crypto);
         });
     });
@@ -85,6 +91,13 @@ function setupCryptoEventListeners() {
  * Analyze Cryptocurrency - Main Function
  */
 async function analyzeCrypto(crypto) {
+    if (!CRYPTO_PATTERN.test(crypto)) {
+        displayInputError('Please enter a valid crypto symbol (1-10 uppercase letters, dots or hyphens).');
+        return;
+    }
+
+    clearInputError();
+
     if (isAnalyzingCrypto) return;
     
     console.log(`Analyzing crypto ${crypto}...`);
@@ -480,6 +493,25 @@ function hideCryptoLoadingState() {
     if (analyzeBtn) analyzeBtn.disabled = false;
     if (analyzeText) analyzeText.textContent = 'Analyze';
     if (loadingOverlay) loadingOverlay.style.display = 'none';
+}
+
+/**
+ * Input validation helpers
+ */
+function displayInputError(message) {
+    clearInputError();
+    const input = document.getElementById('cryptoInput');
+    if (!input) return;
+    const errorEl = document.createElement('div');
+    errorEl.id = 'cryptoError';
+    errorEl.className = 'text-danger mt-1';
+    errorEl.textContent = message;
+    input.parentElement.insertAdjacentElement('afterend', errorEl);
+}
+
+function clearInputError() {
+    const errorEl = document.getElementById('cryptoError');
+    if (errorEl) errorEl.remove();
 }
 
 function showCryptoError(message) {

@@ -5,6 +5,7 @@
 
 let currentTicker = 'SPY';
 let isAnalyzing = false;
+const TICKER_PATTERN = /^[A-Z.-]{1,10}$/;
 
 /**
  * Initialize Dashboard
@@ -90,11 +91,17 @@ function setupEventListeners() {
         }
     });
 
+    // Clear error on input change
+    tickerInput.addEventListener('input', () => {
+        clearInputError();
+    });
+
     // Quick ticker buttons
     quickTickers.forEach(btn => {
         btn.addEventListener('click', () => {
             const ticker = btn.getAttribute('data-ticker');
             tickerInput.value = ticker;
+            clearInputError();
             analyzeStock(ticker);
         });
     });
@@ -139,6 +146,13 @@ function setupScrollTopButton() {
  * Analyze Stock - Main Function
  */
 async function analyzeStock(ticker) {
+    if (!TICKER_PATTERN.test(ticker)) {
+        displayInputError('Please enter a valid stock symbol (1-10 uppercase letters, dots or hyphens).');
+        return;
+    }
+
+    clearInputError();
+
     if (isAnalyzing) return;
     
     console.log(`Analyzing ${ticker}...`);
@@ -362,6 +376,25 @@ function hideLoadingState() {
     isAnalyzing = false;
     
     console.log('Loading state hidden successfully');
+}
+
+/**
+ * Input validation helpers
+ */
+function displayInputError(message) {
+    clearInputError();
+    const input = document.getElementById('tickerInput');
+    if (!input) return;
+    const errorEl = document.createElement('div');
+    errorEl.id = 'tickerError';
+    errorEl.className = 'text-danger mt-1';
+    errorEl.textContent = message;
+    input.parentElement.insertAdjacentElement('afterend', errorEl);
+}
+
+function clearInputError() {
+    const errorEl = document.getElementById('tickerError');
+    if (errorEl) errorEl.remove();
 }
 
 /**
