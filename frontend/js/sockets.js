@@ -294,13 +294,18 @@ function unsubscribeTicker(ticker) {
 function updateConnectionStatus(status, text) {
     const statusElement = document.getElementById('connectionStatus');
     const textElement = document.getElementById('connectionText');
-    
+    const containerElement = document.getElementById('connectionStatusContainer');
+
     if (statusElement) {
         statusElement.className = `status-indicator ${getStatusClass(status)}`;
     }
-    
+
     if (textElement) {
         textElement.textContent = text;
+    }
+
+    if (containerElement) {
+        containerElement.setAttribute('aria-label', `Connection status: ${text}`);
     }
 }
 
