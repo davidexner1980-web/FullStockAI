@@ -1,5 +1,4 @@
 import json
-import os
 import sys
 import types
 import pathlib
@@ -44,7 +43,63 @@ sys.modules['server.utils.strategic.health_monitor'] = mod_health
 sys.modules['server.utils.services.portfolio_manager'] = types.ModuleType('server.utils.services.portfolio_manager')
 sys.modules['server.utils.services.portfolio_manager'].PortfolioManager = object
 
-from app import app
+# Provide minimal implementations for optional dependencies
+
+class _DummySQLAlchemy:
+    def __init__(self, *_, **__):
+        pass
+
+    def init_app(self, app):  # pragma: no cover - stub
+        return None
+
+    def create_all(self):  # pragma: no cover - stub
+        return None
+
+
+class _DummyMail:
+    def init_app(self, app):  # pragma: no cover - stub
+        return None
+
+
+
+
+class _DummyScheduler:
+    def __init__(self, *_, **__):
+        self.running = False
+
+    def start(self):
+        self.running = True
+
+    def shutdown(self):
+        self.running = False
+
+    def add_job(self, *_, **__):  # pragma: no cover - stub
+        return None
+
+
+sys.modules['sqlalchemy'] = types.ModuleType('sqlalchemy')
+orm_mod = types.ModuleType('sqlalchemy.orm')
+orm_mod.DeclarativeBase = type('DeclarativeBase', (), {})
+sys.modules['sqlalchemy.orm'] = orm_mod
+
+fs_mod = types.ModuleType('flask_sqlalchemy')
+fs_mod.SQLAlchemy = _DummySQLAlchemy
+sys.modules['flask_sqlalchemy'] = fs_mod
+
+mail_mod = types.ModuleType('flask_mail')
+mail_mod.Mail = _DummyMail
+sys.modules['flask_mail'] = mail_mod
+
+
+aps_mod = types.ModuleType('apscheduler.schedulers.background')
+aps_mod.BackgroundScheduler = _DummyScheduler
+sys.modules['apscheduler'] = types.ModuleType('apscheduler')
+sys.modules['apscheduler.schedulers'] = types.ModuleType('apscheduler.schedulers')
+sys.modules['apscheduler.schedulers.background'] = aps_mod
+
+sys.modules['models'] = types.ModuleType('models')
+
+from app import app  # noqa: E402
 
 
 def _run_server():
