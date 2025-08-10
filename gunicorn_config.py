@@ -1,21 +1,21 @@
-# Gunicorn configuration for Flask-SocketIO with WebSocket support
+# Gunicorn configuration for Flask-Sock with gevent WebSocket support
 import multiprocessing
 
 # Server socket
 bind = "0.0.0.0:5000"
 backlog = 512
 
-# Worker processes optimized for Flask-SocketIO
-workers = 1  # Single worker required for SocketIO
-worker_class = "eventlet"  # Required for WebSocket support
+# Worker processes optimized for WebSocket
+workers = 1
+worker_class = "gevent"
 worker_connections = 1000
-timeout = 120  # Extended timeout for WebSocket connections
+timeout = 120
 keepalive = 5
 
-# Restart workers - adjusted for SocketIO stability
-max_requests = 0  # Disable auto-restart for WebSocket stability
+# Restart workers - adjusted for WebSocket stability
+max_requests = 0
 max_requests_jitter = 0
-preload_app = False  # Disable preloading for SocketIO compatibility
+preload_app = False
 
 # Logging
 loglevel = "info"

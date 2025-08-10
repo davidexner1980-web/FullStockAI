@@ -1,11 +1,15 @@
-import threading
-import time
+import json
 import os
 import sys
 import types
 import pathlib
+import time
 
-import socketio
+import eventlet
+import eventlet.wsgi
+import websocket
+
+eventlet.monkey_patch()
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -40,25 +44,20 @@ sys.modules['server.utils.strategic.health_monitor'] = mod_health
 sys.modules['server.utils.services.portfolio_manager'] = types.ModuleType('server.utils.services.portfolio_manager')
 sys.modules['server.utils.services.portfolio_manager'].PortfolioManager = object
 
-from app import app, socketio as server_socketio
+from app import app
 
 
 def _run_server():
-    server_socketio.run(app, host="127.0.0.1", port=8765, use_reloader=False)
+    eventlet.wsgi.server(eventlet.listen(('127.0.0.1', 8765)), app)
 
 
 def test_ws_quotes():
-    server = threading.Thread(target=_run_server, daemon=True)
-    server.start()
+    server = eventlet.spawn(_run_server)
     time.sleep(1)
 
-    client = socketio.Client()
-    received = {}
+    ws = websocket.create_connection("ws://127.0.0.1:8765/ws/quotes")
+    data = json.loads(ws.recv())
+    ws.close()
+    server.kill()
 
-    @client.on('quote', namespace='/ws/quotes')
-    def on_quote(data):
-        received.update(data)
-        client.disconnect()
-
-    client.connect('http://127.0.0.1:8765', namespaces=['/ws/quotes'])
-    assert "ticker" in received
+    assert "ticker" in data
