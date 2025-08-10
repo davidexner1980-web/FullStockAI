@@ -34,6 +34,7 @@ dependencies = [
     "gevent==24.2.1",
     "gevent-websocket==0.10.1",
     "eventlet==0.40.2",
+    "websocket-client==1.8.0",
 ]
 
 [build-system]
@@ -51,5 +52,4 @@ dev = [
     "pytest==8.4.1",
     "ruff==0.12.7",
     "pyright==1.1.403",
-    "websocket-client==1.8.0",
 ]
