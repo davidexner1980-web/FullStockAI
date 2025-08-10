@@ -1,0 +1,38 @@
+/* Design Tokens */
+:root {
+  /* Colors */
+  --fs-color-bg: #121212;
+  --fs-color-text: #ffffff;
+  --fs-color-muted: #8e9297;
+  --fs-color-primary: #667eea;
+  --fs-color-secondary: #764ba2;
+  --fs-color-success: #4facfe;
+  --fs-color-danger: #fa709a;
+
+  /* Spacing Scale */
+  --fs-spacing-xs: 0.25rem;
+  --fs-spacing-sm: 0.5rem;
+  --fs-spacing-md: 1rem;
+  --fs-spacing-lg: 1.5rem;
+  --fs-spacing-xl: 3rem;
+
+  /* Border Radius */
+  --fs-radius-sm: 0.25rem;
+  --fs-radius-md: 0.75rem;
+  --fs-radius-lg: 1rem;
+
+  /* Shadows */
+  --fs-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --fs-shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --fs-shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.4);
+
+  /* Z-Index Scale */
+  --fs-z-dropdown: 1000;
+  --fs-z-sticky: 1030;
+  --fs-z-modal: 1050;
+  --fs-z-toast: 1080;
+
+  /* Transitions */
+  --fs-transition-fast: 150ms ease-in-out;
+  --fs-transition-base: 300ms ease-in-out;
+}

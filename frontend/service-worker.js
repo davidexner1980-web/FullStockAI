@@ -14,6 +14,7 @@ const STATIC_ASSETS = [
     '/crypto.html',
     '/oracle.html', 
     '/portfolio.html',
+    '/css/app.css',
     '/css/styles.css',
     '/js/dashboard.js',
     '/js/crypto.js',

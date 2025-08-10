@@ -2,23 +2,22 @@
 /* Bootstrap 5 Dark Theme Overrides + Mobile-First Design */
 
 :root {
-  --bs-dark: #121212;
+  --bs-dark: var(--fs-color-bg);
   --bs-dark-rgb: 18, 18, 18;
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --primary-gradient: linear-gradient(135deg, var(--fs-color-primary) 0%, var(--fs-color-secondary) 100%);
   --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
   --card-bg: rgba(255, 255, 255, 0.05);
   --card-border: rgba(255, 255, 255, 0.1);
-  --text-muted: #8e9297;
-  --animation-speed: 0.3s;
+  --text-muted: var(--fs-color-muted);
 }
 
 /* Base Styles */
 body {
   background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
   background-attachment: fixed;
-  color: #ffffff;
+  color: var(--fs-color-text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
@@ -28,15 +27,15 @@ body {
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 16px;
+  border-radius: var(--fs-radius-lg);
   backdrop-filter: blur(20px);
-  transition: all var(--animation-speed) ease;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all var(--fs-transition-base);
+  box-shadow: var(--fs-shadow-md);
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--fs-shadow-lg);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -44,11 +43,11 @@ body {
   background: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid var(--card-border);
   padding: 1.25rem;
-  border-radius: 16px 16px 0 0 !important;
+  border-radius: var(--fs-radius-lg) var(--fs-radius-lg) 0 0 !important;
 }
 
 .card-body {
-  padding: 1.5rem;
+  padding: var(--fs-spacing-lg);
 }
 
 /* Navigation Enhancements */
@@ -56,10 +55,10 @@ body {
   background: rgba(18, 18, 18, 0.95) !important;
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--card-border);
-  padding: 1rem 0;
+  padding: var(--fs-spacing-md) 0;
   position: sticky;
   top: 0;
-  z-index: 1030;
+  z-index: var(--fs-z-sticky);
 }
 
 .navbar-brand {
@@ -75,10 +74,10 @@ body {
 .btn-primary {
   background: var(--primary-gradient);
   border: none;
-  border-radius: 12px;
-  padding: 0.75rem 1.5rem;
+  border-radius: var(--fs-radius-md);
+  padding: calc(var(--fs-spacing-sm) + 0.25rem) var(--fs-spacing-md);
   font-weight: 600;
-  transition: all var(--animation-speed) ease;
+  transition: all var(--fs-transition-base);
 }
 
 .btn-primary:hover {
@@ -89,30 +88,30 @@ body {
 .btn-success {
   background: var(--success-gradient);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--fs-radius-md);
 }
 
 .btn-danger {
   background: var(--danger-gradient);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--fs-radius-md);
 }
 
 /* Form Controls */
 .form-control {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  color: #ffffff;
+  border-radius: var(--fs-radius-md);
+  color: var(--fs-color-text);
   padding: 0.875rem 1.25rem;
-  transition: all var(--animation-speed) ease;
+  transition: all var(--fs-transition-base);
 }
 
 .form-control:focus {
   background: rgba(255, 255, 255, 0.08);
   border-color: #667eea;
   box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-  color: #ffffff;
+  color: var(--fs-color-text);
 }
 
 .form-control::placeholder {
@@ -144,7 +143,7 @@ body {
   height: 4px;
   background: var(--primary-gradient);
   opacity: 0;
-  transition: opacity var(--animation-speed) ease;
+  transition: opacity var(--fs-transition-base);
 }
 
 .prediction-card.active::before {
