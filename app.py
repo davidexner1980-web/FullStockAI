@@ -124,7 +124,7 @@ def quotes(ws):
     while True:
         data = {
             'ticker': 'SPY',
-            'timestamp': datetime.now(UTC).isoformat()
+            'timestamp': datetime.now(UTC).isoformat(timespec="seconds"),
         }
         ws.send(json.dumps(data))
         socketio.sleep(1)

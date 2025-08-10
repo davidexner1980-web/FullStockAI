@@ -103,7 +103,7 @@ def _generate_prediction(ticker: str, data: pd.DataFrame | None = None) -> dict[
         'current_price': current_price,
         'predictions': predictions,
         'agreement_level': agreement_level,
-        'timestamp': datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S+00:00"),
+        'timestamp': datetime.now(UTC).isoformat(timespec="seconds"),
     }
 
     return response_data
