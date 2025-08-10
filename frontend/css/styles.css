@@ -68,6 +68,8 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  /* Fallback color for browsers without text-clip support */
+  color: var(--fs-color-primary);
 }
 
 /* Button Enhancements */
@@ -127,6 +129,8 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-align: center;
+  /* Fallback color to maintain readability */
+  color: var(--fs-color-success);
 }
 
 .prediction-card {
@@ -365,6 +369,8 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  /* Ensure visible text when gradients are unsupported */
+  color: var(--fs-color-primary);
 }
 
 .glass-effect {
