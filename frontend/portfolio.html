@@ -316,6 +316,8 @@
         </div>
     </div>
 
+    <div id="toastContainer" class="toast-container"></div>
+
     <!-- Loading Overlay -->
     <div id="portfolioLoadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.8); z-index: 9999; display: none;">
         <div class="text-center">
@@ -330,6 +332,7 @@
     
     <!-- Application Scripts -->
     <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
     
     <script>

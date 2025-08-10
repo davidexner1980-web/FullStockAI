@@ -444,8 +444,8 @@ function hideOracleLoadingState() {
 }
 
 function showOracleError(message) {
-    console.error('Oracle error:', message);
-    
+    createToast(message, 'error');
+
     // Update main oracle panel with error message
     document.getElementById('oracleSymbol').textContent = '🌫️';
     document.getElementById('oracleTitle').textContent = 'Oracle Vision Clouded';

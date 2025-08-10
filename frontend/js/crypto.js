@@ -483,8 +483,7 @@ function hideCryptoLoadingState() {
 }
 
 function showCryptoError(message) {
-    console.error('Crypto error:', message);
-    // Could implement toast notification
+    createToast(message, 'error');
 }
 
 /**

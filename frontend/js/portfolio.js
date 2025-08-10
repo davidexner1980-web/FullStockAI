@@ -596,8 +596,7 @@ function hidePortfolioLoadingState() {
 }
 
 function showPortfolioError(message) {
-    console.error('Portfolio error:', message);
-    // Could implement toast notification
+    createToast(message, 'error');
 }
 
 /**
