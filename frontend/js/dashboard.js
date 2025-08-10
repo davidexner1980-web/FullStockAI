@@ -368,8 +368,7 @@ function hideLoadingState() {
  * Show Error Message
  */
 function showError(message) {
-    // You could implement a toast notification system here
-    console.error(message);
+    createToast(message, 'error');
 }
 
 /**
