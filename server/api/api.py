@@ -28,89 +28,88 @@ curiosity_engine = CuriosityEngine()
 health_monitor = HealthMonitor()
 portfolio_manager = PortfolioManager()
 
+def _generate_prediction(ticker, data=None):
+    """Generate stock predictions and related metrics."""
+    ticker = ticker.upper()
+
+    stock_data = data if data is not None else data_fetcher.get_stock_data(ticker)
+    if stock_data is None or stock_data.empty:
+        raise ValueError('Failed to fetch data for ticker')
+
+    current_price = float(stock_data['Close'].iloc[-1])
+
+    predictions = {}
+    successful_predictions = []
+
+    try:
+        rf_prediction = ml_manager.predict_random_forest(stock_data)
+        if rf_prediction and 'prediction' in rf_prediction:
+            predictions['random_forest'] = rf_prediction
+            successful_predictions.append(rf_prediction['prediction'])
+    except Exception as e:
+        logging.error(f"Random Forest prediction failed: {str(e)}")
+        predictions['random_forest'] = {'error': f'Random Forest failed: {str(e)}'}
+
+    try:
+        lstm_prediction = ml_manager.predict_lstm(stock_data)
+        if lstm_prediction and 'prediction' in lstm_prediction:
+            predictions['lstm'] = lstm_prediction
+            successful_predictions.append(lstm_prediction['prediction'])
+    except Exception as e:
+        logging.warning(f"LSTM prediction failed: {str(e)}")
+        predictions['lstm'] = {'error': f'LSTM failed: {str(e)}'}
+
+    try:
+        xgb_prediction = ml_manager.predict_xgboost(stock_data)
+        if xgb_prediction and 'prediction' in xgb_prediction:
+            predictions['xgboost'] = xgb_prediction
+            successful_predictions.append(xgb_prediction['prediction'])
+    except Exception as e:
+        logging.error(f"XGBoost prediction failed: {str(e)}")
+        predictions['xgboost'] = {'error': f'XGBoost failed: {str(e)}'}
+
+    if successful_predictions:
+        ensemble_prediction = sum(successful_predictions) / len(successful_predictions)
+        ensemble_confidence = min(0.95, len(successful_predictions) / 3.0 * 0.75)
+    else:
+        ensemble_prediction = current_price * 1.01
+        ensemble_confidence = 0.3
+
+    predictions['ensemble'] = {
+        'prediction': ensemble_prediction,
+        'confidence': ensemble_confidence,
+    }
+
+    if len(successful_predictions) >= 2:
+        max_pred = max(successful_predictions)
+        min_pred = min(successful_predictions)
+        agreement_level = 1.0 - (abs(max_pred - min_pred) / max_pred)
+    else:
+        agreement_level = 0.5
+
+    response_data = {
+        'ticker': ticker,
+        'current_price': current_price,
+        'predictions': predictions,
+        'agreement_level': agreement_level,
+        'timestamp': datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S+00:00"),
+    }
+
+    return response_data
+
 @api_bp.route('/predict/<ticker>')
 @cache.cached(timeout=300)
 def predict(ticker):
     """Main prediction endpoint with all models"""
     try:
-        ticker = ticker.upper()
-        
-        # Get data
-        data = data_fetcher.get_stock_data(ticker)
-        if data is None or data.empty:
-            return jsonify({'error': 'Failed to fetch data for ticker'}), 400
-        
-        current_price = float(data['Close'].iloc[-1])
-        
-        # Get predictions from all models (handle failures gracefully)
-        predictions = {}
-        successful_predictions = []
-        
-        try:
-            rf_prediction = ml_manager.predict_random_forest(data)
-            if rf_prediction and 'prediction' in rf_prediction:
-                predictions['random_forest'] = rf_prediction
-                successful_predictions.append(rf_prediction['prediction'])
-        except Exception as e:
-            logging.error(f"Random Forest prediction failed: {str(e)}")
-            predictions['random_forest'] = {'error': f'Random Forest failed: {str(e)}'}
-        
-        try:
-            lstm_prediction = ml_manager.predict_lstm(data)
-            if lstm_prediction and 'prediction' in lstm_prediction:
-                predictions['lstm'] = lstm_prediction
-                successful_predictions.append(lstm_prediction['prediction'])
-        except Exception as e:
-            logging.warning(f"LSTM prediction failed: {str(e)}")
-            predictions['lstm'] = {'error': f'LSTM failed: {str(e)}'}
-        
-        try:
-            xgb_prediction = ml_manager.predict_xgboost(data)
-            if xgb_prediction and 'prediction' in xgb_prediction:
-                predictions['xgboost'] = xgb_prediction
-                successful_predictions.append(xgb_prediction['prediction'])
-        except Exception as e:
-            logging.error(f"XGBoost prediction failed: {str(e)}")
-            predictions['xgboost'] = {'error': f'XGBoost failed: {str(e)}'}
-        
-        # Calculate ensemble prediction
-        if successful_predictions:
-            ensemble_prediction = sum(successful_predictions) / len(successful_predictions)
-            ensemble_confidence = min(0.95, len(successful_predictions) / 3.0 * 0.75)
-        else:
-            ensemble_prediction = current_price * 1.01  # Fallback slight increase
-            ensemble_confidence = 0.3
-        
-        predictions['ensemble'] = {
-            'prediction': ensemble_prediction,
-            'confidence': ensemble_confidence
-        }
-        
-        # Calculate model agreement
-        if len(successful_predictions) >= 2:
-            max_pred = max(successful_predictions)
-            min_pred = min(successful_predictions)
-            agreement_level = 1.0 - (abs(max_pred - min_pred) / max_pred)
-        else:
-            agreement_level = 0.5
-        
-        # Prepare response
-        response_data = {
-            'ticker': ticker,
-            'current_price': current_price,
-            'predictions': predictions,
-            'agreement_level': agreement_level,
-            'timestamp': datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S+00:00")
-        }
-        
-        # Emit real-time update via WebSocket
+        response_data = _generate_prediction(ticker)
         try:
             socketio.emit('prediction_update', response_data)
         except Exception as e:
             logging.warning(f"WebSocket emit failed: {str(e)}")
-        
         return jsonify(response_data)
-        
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         logging.error(f"Prediction endpoint error: {str(e)}")
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
@@ -302,74 +301,11 @@ def handle_request_prediction(data):
     try:
         ticker = data.get('ticker', 'SPY').upper()
         logging.info(f'Prediction requested for {ticker} via WebSocket')
-        
-        # Get data and predictions
-        stock_data = data_fetcher.get_stock_data(ticker)
-        if stock_data is None or stock_data.empty:
-            emit('error', {'message': f'Failed to fetch data for {ticker}'})
-            return
-        
-        current_price = float(stock_data['Close'].iloc[-1])
-        
-        # Get predictions from all models
-        predictions = {}
-        successful_predictions = []
-        
-        try:
-            rf_prediction = ml_manager.predict_random_forest(stock_data)
-            if rf_prediction and 'prediction' in rf_prediction:
-                predictions['random_forest'] = rf_prediction
-                successful_predictions.append(rf_prediction['prediction'])
-        except Exception as e:
-            predictions['random_forest'] = {'error': f'Random Forest failed: {str(e)}'}
-        
-        try:
-            lstm_prediction = ml_manager.predict_lstm(stock_data)
-            if lstm_prediction and 'prediction' in lstm_prediction:
-                predictions['lstm'] = lstm_prediction
-                successful_predictions.append(lstm_prediction['prediction'])
-        except Exception as e:
-            predictions['lstm'] = {'error': f'LSTM failed: {str(e)}'}
-        
-        try:
-            xgb_prediction = ml_manager.predict_xgboost(stock_data)
-            if xgb_prediction and 'prediction' in xgb_prediction:
-                predictions['xgboost'] = xgb_prediction
-                successful_predictions.append(xgb_prediction['prediction'])
-        except Exception as e:
-            predictions['xgboost'] = {'error': f'XGBoost failed: {str(e)}'}
-        
-        # Calculate ensemble
-        if successful_predictions:
-            ensemble_prediction = sum(successful_predictions) / len(successful_predictions)
-            ensemble_confidence = min(0.95, len(successful_predictions) / 3.0 * 0.75)
-        else:
-            ensemble_prediction = current_price * 1.01
-            ensemble_confidence = 0.3
-        
-        predictions['ensemble'] = {
-            'prediction': ensemble_prediction,
-            'confidence': ensemble_confidence
-        }
-        
-        # Calculate agreement
-        if len(successful_predictions) >= 2:
-            max_pred = max(successful_predictions)
-            min_pred = min(successful_predictions)
-            agreement_level = 1.0 - (abs(max_pred - min_pred) / max_pred)
-        else:
-            agreement_level = 0.5
-        
-        response_data = {
-            'ticker': ticker,
-            'current_price': current_price,
-            'predictions': predictions,
-            'agreement_level': agreement_level,
-            'timestamp': datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S+00:00")
-        }
-        
+
+        response_data = _generate_prediction(ticker)
         emit('prediction_update', response_data)
-        
+    except ValueError as e:
+        emit('error', {'message': str(e)})
     except Exception as e:
         logging.error(f"Request prediction error: {str(e)}")
         ticker_name = data.get('ticker', 'unknown') if data else 'unknown'
