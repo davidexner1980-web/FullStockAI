@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional
 import logging
 from app import db
@@ -144,7 +144,7 @@ class PortfolioTracker:
                 total_quantity = existing_position.quantity + quantity
                 existing_position.purchase_price = total_cost / total_quantity
                 existing_position.quantity = total_quantity
-                existing_position.purchase_date = datetime.utcnow()
+                existing_position.purchase_date = datetime.now(timezone.utc)
             else:
                 # Create new position
                 new_position = Portfolio(
@@ -153,7 +153,7 @@ class PortfolioTracker:
                     quantity=quantity,
                     purchase_price=purchase_price,
                     asset_type=asset_type,
-                    purchase_date=datetime.utcnow()
+                    purchase_date=datetime.now(timezone.utc)
                 )
                 db.session.add(new_position)
             

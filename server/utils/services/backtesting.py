@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import yfinance as yf
 from server.utils.services.data_fetcher import DataFetcher
 from server.ml.ml_models import MLModelManager
@@ -59,7 +59,7 @@ class BacktestingEngine:
                 'trades': trades,
                 'portfolio_values': portfolio_values,
                 'benchmark': self._calculate_benchmark(data, initial_capital),
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             }
             
             return results

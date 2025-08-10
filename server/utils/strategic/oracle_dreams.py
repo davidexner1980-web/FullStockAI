@@ -1,7 +1,7 @@
 import json
 import random
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import os
 from server.utils.services.data_fetcher import DataFetcher
 import numpy as np
@@ -70,8 +70,8 @@ class OracleDreams:
             
             # Create dream record
             dream = {
-                'timestamp': datetime.utcnow().isoformat(),
-                'dream_id': f"dream_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'dream_id': f"dream_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}",
                 'emotional_state': emotional_state,
                 'market_consciousness': market_analysis,
                 'mystical_narrative': narrative,
@@ -90,7 +90,7 @@ class OracleDreams:
             
         except Exception as e:
             logging.error(f"Error generating Oracle dream: {str(e)}")
-            return {'error': 'Oracle connection disrupted', 'timestamp': datetime.utcnow().isoformat()}
+            return {'error': 'Oracle connection disrupted', 'timestamp': datetime.now(timezone.utc).isoformat()}
     
     def _analyze_market_consciousness(self):
         """Analyze collective market consciousness through major indices"""

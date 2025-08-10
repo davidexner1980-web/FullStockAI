@@ -1,7 +1,7 @@
 import json
 import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from flask_mail import Message
 from app import mail, socketio
 import smtplib
@@ -35,7 +35,7 @@ class NotificationService:
             with open(self.alerts_file, 'r') as f:
                 alerts = json.load(f)
             
-            alert_id = f"{user_id}_{ticker}_{alert_type}_{datetime.utcnow().timestamp()}"
+            alert_id = f"{user_id}_{ticker}_{alert_type}_{datetime.now(timezone.utc).timestamp()}"
             
             alert_data = {
                 'id': alert_id,
@@ -45,7 +45,7 @@ class NotificationService:
                 'target_value': target_value,
                 'email': email,
                 'is_active': True,
-                'created_at': datetime.utcnow().isoformat(),
+                'created_at': datetime.now(timezone.utc).isoformat(),
                 'triggered_at': None,
                 'trigger_count': 0
             }
@@ -124,7 +124,7 @@ class NotificationService:
             # Update alerts file
             if triggered_alerts:
                 for alert_id in triggered_alerts:
-                    alerts[alert_id]['triggered_at'] = datetime.utcnow().isoformat()
+                    alerts[alert_id]['triggered_at'] = datetime.now(timezone.utc).isoformat()
                     alerts[alert_id]['trigger_count'] += 1
                 
                 with open(self.alerts_file, 'w') as f:
@@ -198,7 +198,7 @@ class NotificationService:
                 'message': message,
                 'current_price': float(current_price),
                 'target_value': target_value,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             })
             
             # Send email if provided
@@ -225,7 +225,7 @@ FullStock AI Price Alert
 
 {message}
 
-Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
+Time: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
 
 This is an automated alert from FullStock AI vNext Ultimate.
 
@@ -249,7 +249,7 @@ The FullStock AI Team
             log_entry = {
                 'alert_id': alert_id,
                 'message': message,
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'type': 'price_alert'
             }
             
@@ -273,7 +273,7 @@ The FullStock AI Team
                 'title': title,
                 'message': message,
                 'type': notification_type,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             })
             
             # Log system notification
@@ -292,7 +292,7 @@ The FullStock AI Team
             total_notifications = len(log_entries)
             
             # Last 24 hours
-            yesterday = datetime.utcnow() - timedelta(hours=24)
+            yesterday = datetime.now(timezone.utc) - timedelta(hours=24)
             recent_notifications = [
                 entry for entry in log_entries 
                 if datetime.fromisoformat(entry['timestamp']) > yesterday

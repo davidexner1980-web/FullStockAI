@@ -12,7 +12,7 @@ from server.utils.strategic.curiosity_engine import CuriosityEngine
 from server.utils.strategic.health_monitor import HealthMonitor
 from server.utils.services.portfolio_manager import PortfolioManager
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 api_bp = Blueprint('api', __name__)
 
@@ -92,7 +92,7 @@ def _generate_prediction(ticker, data=None):
         'current_price': current_price,
         'predictions': predictions,
         'agreement_level': agreement_level,
-        'timestamp': datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S+00:00"),
+        'timestamp': datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S%z"),
     }
 
     return response_data
@@ -241,7 +241,7 @@ def health_check():
         
         health_status = {
             'status': 'healthy',
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'services': {
                 'data_fetcher': data_status,
                 'ml_manager': 'healthy',
@@ -259,7 +259,7 @@ def health_check():
         return jsonify({
             'status': 'unhealthy',
             'error': str(e),
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }), 500
 
 # WebSocket event handlers
@@ -267,7 +267,7 @@ def health_check():
 def handle_connect():
     """Handle WebSocket connection"""
     logging.info('Client connected to WebSocket')
-    emit('connected', {'status': 'Connected to FullStock AI', 'timestamp': datetime.utcnow().isoformat()})
+    emit('connected', {'status': 'Connected to FullStock AI', 'timestamp': datetime.now(timezone.utc).isoformat()})
 
 @socketio.on('disconnect') 
 def handle_disconnect():
@@ -288,7 +288,7 @@ def handle_subscribe_ticker(data):
             emit('price_update', {
                 'ticker': ticker,
                 'price': current_price,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             })
     except Exception as e:
         logging.error(f"Subscribe ticker error: {str(e)}")
@@ -337,7 +337,7 @@ def handle_live_data_request(data):
             emit('live_price_update', {
                 'ticker': ticker,
                 'price': current_price,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             })
     except Exception as e:
         logging.error(f"Live data request error: {str(e)}")
@@ -356,7 +356,7 @@ def get_sentiment(symbol):
         return jsonify({
             'symbol': symbol,
             'sentiment': sentiment_data,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         })
     except Exception as e:
         logging.error(f"Sentiment analysis error: {str(e)}")
@@ -372,7 +372,7 @@ def get_oracle_vision(symbol):
         return jsonify({
             'symbol': symbol,
             'vision': vision_data,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         })
     except Exception as e:
         logging.error(f"Oracle vision error: {str(e)}")
@@ -386,7 +386,7 @@ def get_oracle_dreams():
         dreams_data = oracle_service.generate_insight('MARKET')
         return jsonify({
             'dreams': dreams_data,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         })
     except Exception as e:
         logging.error(f"Oracle dreams error: {str(e)}")
@@ -403,7 +403,7 @@ def get_portfolio_analysis(symbol):
         return jsonify({
             'symbol': symbol,
             'portfolio_analysis': portfolio_data,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         })
     except Exception as e:
         logging.error(f"Portfolio analysis error: {str(e)}")
@@ -417,7 +417,7 @@ def get_model_status():
         status_data = health_monitor.get_health_status()
         return jsonify({
             'model_status': status_data,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         })
     except Exception as e:
         logging.error(f"Model status error: {str(e)}")
@@ -433,7 +433,7 @@ def get_curiosity_analysis(symbol):
         return jsonify({
             'symbol': symbol,
             'curiosity_analysis': curiosity_data,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         })
     except Exception as e:
         logging.error(f"Curiosity analysis error: {str(e)}")

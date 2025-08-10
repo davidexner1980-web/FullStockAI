@@ -2,7 +2,7 @@ import psutil
 import os
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import requests
 import yfinance as yf
 from app import db
@@ -67,7 +67,7 @@ class HealthMonitor:
             
             # Create health report
             health_report = {
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'overall_status': overall_status,
                 'health_score': health_score,
                 'system_resources': {
@@ -95,7 +95,7 @@ class HealthMonitor:
         except Exception as e:
             logging.error(f"Error getting health status: {str(e)}")
             return {
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'overall_status': 'ERROR',
                 'error': f'Health check failed: {str(e)}'
             }
@@ -186,7 +186,7 @@ class HealthMonitor:
         
         for api_name, test_func in api_tests.items():
             try:
-                start_time = datetime.utcnow()
+                start_time = datetime.now(timezone.utc)
                 status, response_time, details = test_func()
                 
                 results[api_name] = {
@@ -203,7 +203,7 @@ class HealthMonitor:
                 results[api_name] = {
                     'status': 'ERROR',
                     'error': str(e),
-                    'last_checked': datetime.utcnow().isoformat()
+                    'last_checked': datetime.now(timezone.utc).isoformat()
                 }
                 overall_status = 'CRITICAL'
         
@@ -215,13 +215,13 @@ class HealthMonitor:
     def _test_yahoo_finance(self):
         """Test Yahoo Finance API connectivity"""
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(timezone.utc)
             
             # Try to fetch a simple stock quote
             ticker = yf.Ticker("AAPL")
             info = ticker.history(period="1d")
             
-            end_time = datetime.utcnow()
+            end_time = datetime.now(timezone.utc)
             response_time = (end_time - start_time).total_seconds() * 1000
             
             if info.empty:
@@ -240,11 +240,11 @@ class HealthMonitor:
     def _test_internet_connectivity(self):
         """Test basic internet connectivity"""
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(timezone.utc)
             
             response = requests.get('https://httpbin.org/status/200', timeout=10)
             
-            end_time = datetime.utcnow()
+            end_time = datetime.now(timezone.utc)
             response_time = (end_time - start_time).total_seconds() * 1000
             
             if response.status_code == 200:
@@ -268,7 +268,7 @@ class HealthMonitor:
             for model_file in model_files:
                 if os.path.exists(model_file):
                     mtime = os.path.getmtime(model_file)
-                    age_hours = (datetime.utcnow().timestamp() - mtime) / 3600
+                    age_hours = (datetime.now(timezone.utc).timestamp() - mtime) / 3600
                     
                     freshness_results[model_file] = {
                         'age_hours': float(age_hours),
@@ -283,7 +283,7 @@ class HealthMonitor:
             for oracle_file in oracle_files:
                 if os.path.exists(oracle_file):
                     mtime = os.path.getmtime(oracle_file)
-                    age_minutes = (datetime.utcnow().timestamp() - mtime) / 60
+                    age_minutes = (datetime.now(timezone.utc).timestamp() - mtime) / 60
                     
                     status = 'FRESH'
                     if age_minutes > self.thresholds['data_freshness_critical']:
@@ -452,7 +452,7 @@ class HealthMonitor:
         """Get system uptime information"""
         try:
             boot_time = psutil.boot_time()
-            uptime_seconds = datetime.utcnow().timestamp() - boot_time
+            uptime_seconds = datetime.now(timezone.utc).timestamp() - boot_time
             uptime_hours = uptime_seconds / 3600
             
             return {
@@ -564,7 +564,7 @@ class HealthMonitor:
                 logs = json.load(f)
             
             # Filter logs by time period
-            cutoff_time = datetime.utcnow() - timedelta(hours=hours)
+            cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours)
             
             filtered_logs = []
             for log in logs:

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from sklearn.ensemble import IsolationForest
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
@@ -69,7 +69,7 @@ class CuriosityEngine:
             
             return {
                 'ticker': ticker,
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'curiosity_score': float(curiosity_score),
                 'curiosity_level': curiosity_level,
                 'anomaly_detection': {

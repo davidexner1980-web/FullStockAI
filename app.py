@@ -2,7 +2,7 @@ import os
 import logging
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
@@ -125,7 +125,7 @@ def quotes(ws):
     while True:
         data = {
             'ticker': 'SPY',
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }
         ws.send(json.dumps(data))
         time.sleep(1)

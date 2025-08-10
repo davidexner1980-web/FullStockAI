@@ -2,7 +2,7 @@ import hashlib
 import json
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional, Union
 from app import cache
 import pickle
@@ -74,9 +74,9 @@ class CacheManager:
             # Wrap value with metadata
             cache_entry = {
                 'value': value,
-                'cached_at': datetime.utcnow().isoformat(),
+                'cached_at': datetime.now(timezone.utc).isoformat(),
                 'ttl': ttl,
-                'expires_at': (datetime.utcnow() + timedelta(seconds=ttl)).isoformat()
+                'expires_at': (datetime.now(timezone.utc) + timedelta(seconds=ttl)).isoformat()
             }
             
             cache.set(key, cache_entry, timeout=ttl)
@@ -261,14 +261,14 @@ class CacheManager:
                 'deletes': self.cache_stats['deletes'],
                 'total_requests': total_requests,
                 'hit_rate_percent': round(hit_rate, 2),
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             }
             
         except Exception as e:
             self.logger.error(f"Error getting cache stats: {str(e)}")
             return {
                 'error': str(e),
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             }
     
     def warm_cache(self, symbols: list) -> Dict:
@@ -314,7 +314,7 @@ class CacheManager:
                 'symbols_processed': len(symbols),
                 'successful': warmed_count,
                 'failed': failed_count,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             }
             
             self.logger.info(f"Cache warm-up completed: {warmed_count} successful, {failed_count} failed")
@@ -327,7 +327,7 @@ class CacheManager:
                 'symbols_processed': 0,
                 'successful': 0,
                 'failed': len(symbols) if symbols else 0,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             }
     
     def set_with_tags(self, key: str, value: Any, tags: list, ttl: Optional[int] = None) -> bool:
@@ -350,7 +350,7 @@ class CacheManager:
             cache_entry = {
                 'value': value,
                 'tags': tags,
-                'cached_at': datetime.utcnow().isoformat(),
+                'cached_at': datetime.now(timezone.utc).isoformat(),
                 'ttl': ttl
             }
             

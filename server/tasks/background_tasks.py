@@ -3,7 +3,7 @@ from models import User, WatchlistItem, Alert, Prediction
 from server.ml.data_fetcher import DataFetcher
 from server.ml.ml_models import MLModelManager
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import os
 
 logger = logging.getLogger(__name__)
@@ -117,7 +117,7 @@ def check_price_alerts():
                     
                     if triggered:
                         # Mark as triggered
-                        alert.triggered_at = datetime.utcnow()
+                        alert.triggered_at = datetime.now(timezone.utc)
                         alert.is_active = False
                         
                         logger.info(f"Alert triggered for {alert.symbol}: {current_price} vs {alert.threshold}")
@@ -139,7 +139,7 @@ def cleanup_old_predictions():
     with app.app_context():
         try:
             # Delete predictions older than 30 days
-            cutoff_date = datetime.utcnow() - timedelta(days=30)
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=30)
             old_predictions = Prediction.query.filter(Prediction.created_at < cutoff_date).all()
             
             for pred in old_predictions:
@@ -156,7 +156,7 @@ def system_health_check():
     with app.app_context():
         try:
             health_status = {
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'database': 'OK',
                 'api_connectivity': 'OK',
                 'model_status': 'OK',
