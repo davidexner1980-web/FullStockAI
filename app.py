@@ -55,8 +55,8 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 
 # Initialize extensions
 db.init_app(app)
-# Initialize SocketIO with gevent for WebSocket support
-socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', logger=True, engineio_logger=True)
+# Initialize SocketIO with a portable threading async mode
+socketio.init_app(app, cors_allowed_origins="*", async_mode='threading', logger=True, engineio_logger=True)
 cache.init_app(app)
 mail.init_app(app)
 sock.init_app(app)
