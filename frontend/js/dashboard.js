@@ -177,9 +177,7 @@ async function analyzeStock(ticker) {
         
         // Update UI with real data
         updatePredictionDisplay(data);
-        if (typeof window.updateLiveUpdates === 'function') {
-            window.updateLiveUpdates(`📊 Analysis complete for ${ticker}`);
-        }
+        updateLiveUpdates(`📊 Analysis complete for ${ticker}`);
         
         // Load chart data
         await loadChartData(ticker);
@@ -191,9 +189,7 @@ async function analyzeStock(ticker) {
     } catch (error) {
         console.error('Analysis error:', error);
         showError(`Failed to analyze ${ticker}: ${error.message}`);
-        if (typeof window.updateLiveUpdates === 'function') {
-            window.updateLiveUpdates(`❌ Error analyzing ${ticker}: ${error.message}`);
-        }
+        updateLiveUpdates(`❌ Error analyzing ${ticker}: ${error.message}`);
     } finally {
         console.log('Analysis completed, hiding loading state...');
         // Force hide loading immediately
@@ -488,4 +484,3 @@ document.addEventListener('DOMContentLoaded', setupMobileHandlers);
 // Export functions for global access
 window.analyzeStock = analyzeStock;
 window.initializeDashboard = initializeDashboard;
-window.updateLiveUpdates = updateLiveUpdates;
